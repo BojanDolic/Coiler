@@ -10,3 +10,15 @@ const lightCategoryTextStyle = TextStyle(
   fontFamily: "OpenSans",
   color: Colors.black54,
 );
+
+const normalTextStyleOpenSans14 = TextStyle(
+  fontFamily: "OpenSans",
+  fontWeight: FontWeight.normal,
+  fontSize: 15,
+);
+
+const lightBlueColor = Color(0xffe1efff);
+
+enum Units { DEFAULT, MILI, MICRO, NANO, PICO }
+
+const voltageUnitText = "V";
