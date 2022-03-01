@@ -1,4 +1,5 @@
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
+import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
 import 'package:coiler_app/screens/calculators_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/screens/main_screen.dart';
@@ -19,6 +20,8 @@ class MyApp extends StatelessWidget {
         MainScreen.id: (context) => const MainScreen(),
         CalculatorsScreen.id: (context) => const CalculatorsScreen(),
         CapacitorScreen.id: (context) => const CapacitorScreen(),
+        ResonantFrequencyScreen.id: (context) =>
+            const ResonantFrequencyScreen(),
         InformationScreen.id: (context) => const InformationScreen(),
       },
       initialRoute: MainScreen.id,
