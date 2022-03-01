@@ -1,4 +1,5 @@
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
+import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,7 @@ class CalculatorsScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Center(
+            const Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -48,7 +49,7 @@ class CalculatorsScreen extends StatelessWidget {
                 height: 26,
               ),
               onTap: () {
-                //TODO Navigate
+                Navigator.pushNamed(context, ResonantFrequencyScreen.id);
               },
             ),
             CalculatorItem(
