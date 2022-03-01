@@ -1,4 +1,9 @@
-# coiler_app
+# Coiler
+
+## What is Coiler ?
+
+Coiler is an application created using the flutter framework. It is made for tesla coil enthusiasts and builders around the world.
+The main goal is to create one application for everyone, be it the experienced builder of the coil or a beginner looking for information on building his first coil, Coiler has everything you need.
 
 Application for tesla coil calculations.
 
