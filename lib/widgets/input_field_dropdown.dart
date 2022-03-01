@@ -53,6 +53,8 @@ class InputFieldDropDown extends StatelessWidget {
               child: DropdownButton<Units>(
                 borderRadius: BorderRadius.circular(9),
                 value: dropDownValue,
+                style:
+                    normalTextStyleOpenSans14.copyWith(color: Colors.black87),
                 underline: Container(),
                 items: dropDownList,
                 onChanged: (value) => onDropDownChanged(value),

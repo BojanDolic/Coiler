@@ -4,7 +4,7 @@ class Calculator {
 
     try {
       var _cap = (capacitance * parallelCap) / seriesCap;
-      _capacitance = double.parse(_cap.toStringAsFixed(2));
+      _capacitance = double.parse(_cap.toStringAsFixed(7));
     } catch (e) {
       _capacitance = 0.0;
     }

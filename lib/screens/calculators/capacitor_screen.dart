@@ -94,7 +94,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     elevated: true,
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   BorderContainer(
                     elevated: true,
@@ -103,7 +103,12 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Final capacitance: $_finalCapacitance"),
+                            Text(
+                              "Final capacitance: $_finalCapacitance",
+                              style: biggerTextStyleOpenSans15,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 9,
@@ -115,6 +120,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                               child: DropdownButton<Units>(
                                 borderRadius: BorderRadius.circular(9),
                                 value: unitsToConvertTo,
+                                underline: Container(),
                                 items: capacitanceDropDownList,
                                 onChanged: (value) {
                                   setState(() {
@@ -125,7 +131,28 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                               ),
                             )
                           ],
-                        )
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "MMC Voltage: ${seriesCapNum * voltage}",
+                              style: biggerTextStyleOpenSans15,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                  color: lightBlueColor,
+                                  borderRadius: BorderRadius.circular(9)),
+                              child: Text("V"),
+                            )
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -173,7 +200,11 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     maxLength: 6,
                     hintText: "Enter single capacitor voltage",
                     labelText: "Voltage",
-                    onTextChanged: (text) {},
+                    onTextChanged: (text) {
+                      setState(() {
+                        voltage = int.parse(text);
+                      });
+                    },
                     validator: (text) {
                       if (text == null || double.tryParse(text) == 0) {
                         return "Invalid input";

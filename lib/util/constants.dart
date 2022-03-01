@@ -17,6 +17,12 @@ const normalTextStyleOpenSans14 = TextStyle(
   fontSize: 15,
 );
 
+const biggerTextStyleOpenSans15 = TextStyle(
+  fontFamily: "OpenSans",
+  fontWeight: FontWeight.w500,
+  fontSize: 16,
+);
+
 const lightBlueColor = Color(0xffe1efff);
 
 enum Units { DEFAULT, MILI, MICRO, NANO, PICO }
