@@ -6,7 +6,10 @@ class Converter {
     Units.MILI: 0.001,
     Units.MICRO: 0.000001,
     Units.NANO: 0.000000001,
-    Units.PICO: 0.000000000001
+    Units.PICO: 0.000000000001,
+    Units.KILO: 1000,
+    Units.MEGA: 1000000,
+    Units.GIGA: 1000000000,
   };
 
   double getCapMultiplier(Units unit) => unitsMap[unit]!;
@@ -29,7 +32,7 @@ class Converter {
     try {
       var multiplier = getCapMultiplier(from) / getCapMultiplier(to);
       double tempResult = value * multiplier;
-      result = double.parse(tempResult.toStringAsFixed(7));
+      result = tempResult; //double.parse(tempResult.toStringAsFixed(7));
     } catch (e) {
       print(e);
     }
