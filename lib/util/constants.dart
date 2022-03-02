@@ -25,6 +25,7 @@ const biggerTextStyleOpenSans15 = TextStyle(
 
 const lightBlueColor = Color(0xffe1efff);
 
+
 enum Units { DEFAULT, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
 
 const voltageUnitText = "V";
