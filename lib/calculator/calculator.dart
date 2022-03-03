@@ -25,7 +25,6 @@ class Calculator {
   }
 
   double calculateResFrequency(double inductance, double capacitance) {
-
     var sqrtCap = math.sqrt(capacitance);
     var sqrtInd = math.sqrt(inductance);
 
