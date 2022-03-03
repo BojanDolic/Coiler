@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const boldCategoryTextStyle = TextStyle(
   fontFamily: "OpenSans",
@@ -15,6 +16,7 @@ const normalTextStyleOpenSans14 = TextStyle(
   fontFamily: "OpenSans",
   fontWeight: FontWeight.normal,
   fontSize: 15,
+  color: Colors.black87,
 );
 
 const biggerTextStyleOpenSans15 = TextStyle(
@@ -23,9 +25,12 @@ const biggerTextStyleOpenSans15 = TextStyle(
   fontSize: 16,
 );
 
+final decimalOnlyTextFormatter = FilteringTextInputFormatter.allow(
+  RegExp("(^(\\d*)((\\.{1})(\\d*))?)"),
+);
+
 const lightBlueColor = Color(0xffe1efff);
 
-
-enum Units { DEFAULT, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
+enum Units { DEFAULT, CENTI, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
 
 const voltageUnitText = "V";

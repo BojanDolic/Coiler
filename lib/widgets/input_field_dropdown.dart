@@ -1,5 +1,6 @@
 import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputFieldDropDown extends StatelessWidget {
   const InputFieldDropDown({
@@ -13,12 +14,14 @@ class InputFieldDropDown extends StatelessWidget {
     required this.dropDownValue,
     required this.onDropDownChanged,
     required this.dropDownList,
+    this.inputFormatters = const [],
   }) : super(key: key);
 
   final TextEditingController controller;
   final Function(String? text) validator;
-  final Function(dynamic value) onTextChanged;
+  final ValueSetter<String> onTextChanged;
   final Function(Units? unit) onDropDownChanged;
+  final List<TextInputFormatter> inputFormatters;
   final TextInputType inputType;
   final String hintText;
   final String labelText;
@@ -33,6 +36,7 @@ class InputFieldDropDown extends StatelessWidget {
       validator: (text) => validator(text),
       controller: controller,
       keyboardType: inputType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(

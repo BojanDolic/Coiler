@@ -3,6 +3,7 @@ import 'package:coiler_app/util/constants.dart';
 class Converter {
   static const Map<Units, double> unitsMap = {
     Units.DEFAULT: 1.0,
+    Units.CENTI: 0.01,
     Units.MILI: 0.001,
     Units.MICRO: 0.000001,
     Units.NANO: 0.000000001,

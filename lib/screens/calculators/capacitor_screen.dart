@@ -1,4 +1,4 @@
-import 'package:coiler_app/util/calculator.dart';
+import 'package:coiler_app/calculator/calculator.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/list_constants.dart';
