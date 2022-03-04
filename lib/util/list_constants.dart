@@ -57,3 +57,18 @@ const frequencyDropDownList = [
     value: Units.GIGA,
   ),
 ];
+
+const lengthDropDownList = [
+  DropdownMenuItem(
+    child: Text("m"),
+    value: Units.DEFAULT,
+  ),
+  DropdownMenuItem(
+    child: Text("cm"),
+    value: Units.CENTI,
+  ),
+  DropdownMenuItem(
+    child: Text("mm"),
+    value: Units.MILI,
+  ),
+];
