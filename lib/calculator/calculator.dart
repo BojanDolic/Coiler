@@ -37,7 +37,7 @@ class Calculator {
    * Function used to calculate inductance of single-layer helical round-wire coil
    *
    * [turns] turns of the coil
-   * [diameter] diameter of the coil. Needs to be in mm
+   * [diameter] diameter of the coil.
    * [wireDiameter] diameter of the wire used for winding the coil.
    * [turnSpacing] spacing between two adjacent turns of the wire.
    *
