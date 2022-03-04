@@ -1,4 +1,5 @@
 import 'package:coiler_app/screens/calculators_screen.dart';
+import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class MainScreen extends StatelessWidget {
                 color: Colors.orange,
               ),
               onTap: () {
-                //TODO Navigate to...
+                Navigator.pushNamed(context, CoilsListScreen.id);
               },
             ),
             CategoryCard(
