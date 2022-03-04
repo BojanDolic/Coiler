@@ -62,6 +62,19 @@ class MainScreen extends StatelessWidget {
               },
             ),
             CategoryCard(
+              title: "Your coils",
+              description: "Here you can find all of your tesla coils.",
+              image: Image.asset(
+                "assets/tesla_coil_outline_icon.png",
+                height: 42,
+                width: 42,
+                color: Colors.orange,
+              ),
+              onTap: () {
+                //TODO Navigate to...
+              },
+            ),
+            CategoryCard(
               title: "Design guides",
               description:
                   "Read about best practices when building coils and common mistakes to avoid.",
