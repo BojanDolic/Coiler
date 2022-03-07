@@ -66,7 +66,7 @@ class _$CoilsDatabase extends CoilsDatabase {
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 2,
+      version: 7,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -82,7 +82,7 @@ class _$CoilsDatabase extends CoilsDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `resonantFrequency` REAL NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `coilType` TEXT NOT NULL, `resonantFrequency` REAL NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -106,6 +106,7 @@ class _$CoilDao extends CoilDao {
                   'id': item.id,
                   'coilName': item.coilName,
                   'coilDesc': item.coilDesc,
+                  'coilType': item.coilType,
                   'resonantFrequency': item.resonantFrequency
                 },
             changeListener),
@@ -117,6 +118,7 @@ class _$CoilDao extends CoilDao {
                   'id': item.id,
                   'coilName': item.coilName,
                   'coilDesc': item.coilDesc,
+                  'coilType': item.coilType,
                   'resonantFrequency': item.resonantFrequency
                 },
             changeListener);
@@ -133,11 +135,12 @@ class _$CoilDao extends CoilDao {
 
   @override
   Stream<List<Coil>> getCoils() {
-    return _queryAdapter.queryListStream('SELECT * FROM coil',
+    return _queryAdapter.queryListStream('SELECT * FROM Coil',
         mapper: (Map<String, Object?> row) => Coil(
             row['id'] as int?,
             row['coilName'] as String,
             row['coilDesc'] as String,
+            row['coilType'] as String,
             row['resonantFrequency'] as double),
         queryableName: 'Coil',
         isView: false);

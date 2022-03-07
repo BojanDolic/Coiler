@@ -32,5 +32,6 @@ final decimalOnlyTextFormatter = FilteringTextInputFormatter.allow(
 const lightBlueColor = Color(0xffe1efff);
 
 enum Units { DEFAULT, CENTI, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
+enum CoilType { SPARK_GAP, SSTC, DRSSTC }
 
 const voltageUnitText = "V";

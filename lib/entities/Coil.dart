@@ -7,8 +7,10 @@ class Coil {
 
   final String coilName;
   final String coilDesc;
+  final String coilType;
 
   double resonantFrequency;
 
-  Coil(this.id, this.coilName, this.coilDesc, this.resonantFrequency);
+  Coil(this.id, this.coilName, this.coilDesc, this.coilType,
+      this.resonantFrequency);
 }

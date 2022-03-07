@@ -39,4 +39,15 @@ class Converter {
     }
     return result;
   }
+
+  static String getCoilType(CoilType coilType) {
+    switch (coilType) {
+      case CoilType.SPARK_GAP:
+        return "SPARK_GAP";
+      case CoilType.DRSSTC:
+        return "DRSSTC";
+      case CoilType.SSTC:
+        return "SSTC";
+    }
+  }
 }

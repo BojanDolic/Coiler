@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 part 'coil_database.g.dart'; // the generated code will be there
 
-@Database(version: 2, entities: [Coil])
+@Database(version: 7, entities: [Coil])
 abstract class CoilsDatabase extends FloorDatabase {
   CoilDao get coilDao;
 }

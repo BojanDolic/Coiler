@@ -7,14 +7,26 @@ import 'package:coiler_app/screens/calculators_screen.dart';
 import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/screens/main_screen.dart';
+import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database =
-      await $FloorCoilsDatabase.databaseBuilder("coils_database.db").build();
+  final database = await $FloorCoilsDatabase
+      .databaseBuilder("coils_database.db")
+      .addMigrations(
+    [
+      Migration(
+        6,
+        7,
+        (db) {
+          return db.update("Coil", {"coilType": ""});
+        },
+      ),
+    ],
+  ).build();
 
   final coilsDao = database.coilDao;
 

@@ -72,3 +72,18 @@ const lengthDropDownList = [
     value: Units.MILI,
   ),
 ];
+
+const coilTypeDropDownList = [
+  DropdownMenuItem(
+    child: Text("SGTC"),
+    value: CoilType.SPARK_GAP,
+  ),
+  DropdownMenuItem(
+    child: Text("SSTC"),
+    value: CoilType.SSTC,
+  ),
+  DropdownMenuItem(
+    child: Text("DRSSTC"),
+    value: CoilType.DRSSTC,
+  ),
+];

@@ -1,6 +1,8 @@
 import 'package:coiler_app/dao/CoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
-import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/constants.dart' as Constants;
+import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/list_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,8 +21,21 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   late CoilDao coilDao;
 
   String coilName = "";
+  var coilType = Constants.CoilType.SPARK_GAP;
 
   final coilNameController = TextEditingController();
+
+  void createCoil() async {
+    var coilName = coilNameController.text;
+
+    if (coilName.isEmpty) {
+      return;
+    }
+
+    coilDao.insertCoil(
+      Coil(null, coilName, "", Converter.getCoilType(coilType), 0.0),
+    );
+  }
 
   @override
   void initState() {
@@ -54,36 +69,76 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                       },
                       child: const Text(
                         "Close",
-                        style: normalTextStyleOpenSans14,
+                        style: Constants.normalTextStyleOpenSans14,
                       ),
                     ),
                     TextButton(
                       onPressed: () async {
-                        coilDao.insertCoil(
-                          Coil(null, coilName, "", 0.0),
-                        );
+                        setState(() {
+                          createCoil();
+                        });
                         coilNameController.clear();
                         Navigator.pop(context);
                       },
                       child: Text(
                         "Add",
-                        style: normalTextStyleOpenSans14.copyWith(
+                        style: Constants.normalTextStyleOpenSans14.copyWith(
                             color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
                     )
                   ],
-                  content: TextField(
-                    controller: coilNameController,
-                    onChanged: (text) {
-                      coilName = text;
+                  content: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextField(
+                            controller: coilNameController,
+                            onChanged: (text) {
+                              setState(() {
+                                coilName = text;
+                              });
+                            },
+                            maxLength: 16,
+                            decoration: InputDecoration(
+                                hintText: "Enter coil name",
+                                labelText: "Coil name",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                errorText: coilName.isEmpty
+                                    ? "Name can't be empty"
+                                    : null),
+                          ),
+                          const SizedBox(
+                            height: 6,
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black45),
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: DropdownButton<Constants.CoilType>(
+                              value: coilType,
+                              items: coilTypeDropDownList,
+                              onChanged: (value) {
+                                setState(() {
+                                  coilType = value!;
+                                  print(coilType);
+                                });
+                              },
+                              isExpanded: true,
+                              underline: Container(),
+                            ),
+                          )
+                        ],
+                      );
                     },
-                    decoration: InputDecoration(
-                      hintText: "Enter coil name",
-                      labelText: "Coil name",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                    ),
                   ),
                 );
               });
@@ -95,7 +150,14 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
             initialData: [],
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.data != null && snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No data available",
+                    style: Constants.normalTextStyleOpenSans14,
+                  ),
+                );
               }
 
               var coils = snapshot.requireData;
@@ -124,11 +186,11 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                       ),
                       title: Text(
                         coils[index].coilName,
-                        style: boldCategoryTextStyle,
+                        style: Constants.boldCategoryTextStyle,
                       ),
                       subtitle: Text(
                         coils[index].coilDesc,
-                        style: lightCategoryTextStyle,
+                        style: Constants.lightCategoryTextStyle,
                       ),
                       trailing: PopupMenuButton(
                         shape: RoundedRectangleBorder(
@@ -145,12 +207,22 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                                     "Resonant frequency: ${coils[index].resonantFrequency}",
                               ),
                             );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Information copied to clipboard",
+                                  style: Constants.normalTextStyleOpenSans14
+                                      .copyWith(color: Colors.white),
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           }
                         },
                         itemBuilder: (context) {
                           return [
                             PopupMenuItem(
-                              value: "delete",
+                              value: "copy",
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -170,7 +242,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                                 children: [
                                   Text(
                                     "Delete",
-                                    style: normalTextStyleOpenSans14,
+                                    style: Constants.normalTextStyleOpenSans14,
                                   ),
                                   Icon(
                                     Icons.highlight_remove_outlined,
@@ -184,27 +256,27 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                       ),
 
                       /*Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              coilDao.deleteCoil(coils[index]);
-                            },
-                            icon: Icon(
-                              Icons.highlight_remove,
-                              color: Colors.red,
-                            ),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(
-                                    text: "COIL INFORMATION\n\n"
-                                        "Name: ${coils[index].coilName}\n"
-                                        "Resonant frequency: ${coils[index].resonantFrequency}"));
-                              },
-                              icon: Icon(Icons.copy)),
-                        ],
-                      ),*/
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  coilDao.deleteCoil(coils[index]);
+                                },
+                                icon: Icon(
+                                  Icons.highlight_remove,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text: "COIL INFORMATION\n\n"
+                                            "Name: ${coils[index].coilName}\n"
+                                            "Resonant frequency: ${coils[index].resonantFrequency}"));
+                                  },
+                                  icon: Icon(Icons.copy)),
+                            ],
+                          ),*/
                     ),
                   );
                 },
