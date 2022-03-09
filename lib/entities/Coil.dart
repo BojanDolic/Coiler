@@ -1,3 +1,5 @@
+import 'package:coiler_app/entities/CapacitorBank.dart';
+import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:floor/floor.dart';
 
 @entity
@@ -5,12 +7,18 @@ class Coil {
   @primaryKey
   final int? id;
 
-  final String coilName;
-  final String coilDesc;
+  String coilName;
+  String coilDesc;
+  CapacitorBank mmcBank;
   final String coilType;
+  PrimaryCoil primary;
 
-  double resonantFrequency;
-
-  Coil(this.id, this.coilName, this.coilDesc, this.coilType,
-      this.resonantFrequency);
+  Coil({
+    this.id,
+    this.coilName = "",
+    this.coilDesc = "",
+    this.coilType = "",
+    required this.mmcBank,
+    required this.primary,
+  });
 }

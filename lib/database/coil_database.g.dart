@@ -66,7 +66,7 @@ class _$CoilsDatabase extends CoilsDatabase {
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 7,
+      version: 13,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -82,7 +82,7 @@ class _$CoilsDatabase extends CoilsDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `coilType` TEXT NOT NULL, `resonantFrequency` REAL NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `mmcBank` TEXT NOT NULL, `coilType` TEXT NOT NULL, `primary` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -106,8 +106,22 @@ class _$CoilDao extends CoilDao {
                   'id': item.id,
                   'coilName': item.coilName,
                   'coilDesc': item.coilDesc,
+                  'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
                   'coilType': item.coilType,
-                  'resonantFrequency': item.resonantFrequency
+                  'primary': _primaryCoilConverter.encode(item.primary)
+                },
+            changeListener),
+        _coilUpdateAdapter = UpdateAdapter(
+            database,
+            'Coil',
+            ['id'],
+            (Coil item) => <String, Object?>{
+                  'id': item.id,
+                  'coilName': item.coilName,
+                  'coilDesc': item.coilDesc,
+                  'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
+                  'coilType': item.coilType,
+                  'primary': _primaryCoilConverter.encode(item.primary)
                 },
             changeListener),
         _coilDeletionAdapter = DeletionAdapter(
@@ -118,8 +132,9 @@ class _$CoilDao extends CoilDao {
                   'id': item.id,
                   'coilName': item.coilName,
                   'coilDesc': item.coilDesc,
+                  'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
                   'coilType': item.coilType,
-                  'resonantFrequency': item.resonantFrequency
+                  'primary': _primaryCoilConverter.encode(item.primary)
                 },
             changeListener);
 
@@ -131,17 +146,20 @@ class _$CoilDao extends CoilDao {
 
   final InsertionAdapter<Coil> _coilInsertionAdapter;
 
+  final UpdateAdapter<Coil> _coilUpdateAdapter;
+
   final DeletionAdapter<Coil> _coilDeletionAdapter;
 
   @override
   Stream<List<Coil>> getCoils() {
     return _queryAdapter.queryListStream('SELECT * FROM Coil',
         mapper: (Map<String, Object?> row) => Coil(
-            row['id'] as int?,
-            row['coilName'] as String,
-            row['coilDesc'] as String,
-            row['coilType'] as String,
-            row['resonantFrequency'] as double),
+            id: row['id'] as int?,
+            coilName: row['coilName'] as String,
+            coilDesc: row['coilDesc'] as String,
+            coilType: row['coilType'] as String,
+            mmcBank: _capacitorBankConverter.decode(row['mmcBank'] as String),
+            primary: _primaryCoilConverter.decode(row['primary'] as String)),
         queryableName: 'Coil',
         isView: false);
   }
@@ -152,7 +170,16 @@ class _$CoilDao extends CoilDao {
   }
 
   @override
+  Future<void> updateCoil(Coil coil) async {
+    await _coilUpdateAdapter.update(coil, OnConflictStrategy.abort);
+  }
+
+  @override
   Future<void> deleteCoil(Coil coil) async {
     await _coilDeletionAdapter.delete(coil);
   }
 }
+
+// ignore_for_file: unused_element
+final _capacitorBankConverter = CapacitorBankConverter();
+final _primaryCoilConverter = PrimaryCoilConverter();

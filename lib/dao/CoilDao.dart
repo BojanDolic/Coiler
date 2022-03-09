@@ -9,6 +9,9 @@ abstract class CoilDao {
   @delete
   Future<void> deleteCoil(Coil coil);
 
+  @update
+  Future<void> updateCoil(Coil coil);
+
   @Query("SELECT * FROM Coil")
   Stream<List<Coil>> getCoils();
 }

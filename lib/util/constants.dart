@@ -34,4 +34,8 @@ const lightBlueColor = Color(0xffe1efff);
 enum Units { DEFAULT, CENTI, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
 enum CoilType { SPARK_GAP, SSTC, DRSSTC }
 
+const ACTION_DELETE = "delete";
+const ACTION_COPY_INFO = "copy";
+const ACTION_EDIT_INFO = "edit";
+
 const voltageUnitText = "V";

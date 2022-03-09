@@ -1,8 +1,12 @@
 import 'package:coiler_app/dao/CoilDao.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/Coil.dart';
+import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/screens/coil_info_screen.dart';
 import 'package:coiler_app/util/constants.dart' as Constants;
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/list_constants.dart';
+import 'package:coiler_app/widgets/create_coil_dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,19 +26,50 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
 
   String coilName = "";
   var coilType = Constants.CoilType.SPARK_GAP;
+  final dialogFormKey = GlobalKey<FormState>();
 
   final coilNameController = TextEditingController();
 
   void createCoil() async {
     var coilName = coilNameController.text;
 
-    if (coilName.isEmpty) {
-      return;
-    }
-
     coilDao.insertCoil(
-      Coil(null, coilName, "", Converter.getCoilType(coilType), 0.0),
+      Coil(
+          coilName: coilName,
+          coilDesc: "",
+          coilType: Converter.getCoilType(coilType),
+          primary: PrimaryCoil(coilType: ""),
+          mmcBank: CapacitorBank()),
     );
+  }
+
+  Widget openDialog() {
+    return StatefulBuilder(builder: (context, setState) {
+      return CreateCoilDialog(
+        coilNameController: coilNameController,
+        coilType: coilType,
+        formKey: dialogFormKey,
+        onTextChanged: (text) {
+          setState(() {
+            coilName = text;
+          });
+        },
+        onCoilTypeChanged: (coilType) {
+          setState(() {
+            this.coilType = coilType!;
+          });
+        },
+        onAddClick: () async {
+          if (dialogFormKey.currentState!.validate()) {
+            setState(() {
+              createCoil();
+            });
+            coilNameController.clear();
+            Navigator.pop(context);
+          }
+        },
+      );
+    });
   }
 
   @override
@@ -48,100 +83,15 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         isExtended: true,
-        label: Text("New coil"),
+        label: const Text("New coil"),
         icon: const Icon(Icons.add),
         onPressed: () {
           showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  insetPadding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  title: const Text(
-                    "Add new coil",
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "Close",
-                        style: Constants.normalTextStyleOpenSans14,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        setState(() {
-                          createCoil();
-                        });
-                        coilNameController.clear();
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        "Add",
-                        style: Constants.normalTextStyleOpenSans14.copyWith(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                  content: StatefulBuilder(
-                    builder: (context, setState) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextField(
-                            controller: coilNameController,
-                            onChanged: (text) {
-                              setState(() {
-                                coilName = text;
-                              });
-                            },
-                            maxLength: 16,
-                            decoration: InputDecoration(
-                                hintText: "Enter coil name",
-                                labelText: "Coil name",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(9),
-                                ),
-                                errorText: coilName.isEmpty
-                                    ? "Name can't be empty"
-                                    : null),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black45),
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            child: DropdownButton<Constants.CoilType>(
-                              value: coilType,
-                              items: coilTypeDropDownList,
-                              onChanged: (value) {
-                                setState(() {
-                                  coilType = value!;
-                                  print(coilType);
-                                });
-                              },
-                              isExpanded: true,
-                              underline: Container(),
-                            ),
-                          )
-                        ],
-                      );
-                    },
-                  ),
-                );
-              });
+            context: context,
+            builder: (context) {
+              return openDialog();
+            },
+          );
         },
       ),
       body: SafeArea(
@@ -165,6 +115,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
               return ListView.builder(
                 itemCount: coils.length,
                 itemBuilder: (context, index) {
+                  var coil = coils[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -172,6 +123,8 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                     ),
                     child: ListTile(
                       onTap: () {
+                        Navigator.pushNamed(context, CoilInfoScreen.id,
+                            arguments: coil);
                         //TODO Navigate to coil screen
                       },
                       tileColor: Colors.white,
@@ -185,104 +138,66 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                         height: 46,
                       ),
                       title: Text(
-                        coils[index].coilName,
+                        coil.coilName,
                         style: Constants.boldCategoryTextStyle,
                       ),
                       subtitle: Text(
-                        coils[index].coilDesc,
+                        coil.coilDesc,
                         style: Constants.lightCategoryTextStyle,
                       ),
-                      trailing: PopupMenuButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        onSelected: (text) {
-                          if (text == "delete") {
-                            coilDao.deleteCoil(coils[index]);
-                          } else if (text == "copy") {
-                            Clipboard.setData(
-                              ClipboardData(
-                                text: "COIL INFORMATION\n\n"
-                                    "Name: ${coils[index].coilName}\n"
-                                    "Resonant frequency: ${coils[index].resonantFrequency}",
-                              ),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Information copied to clipboard",
-                                  style: Constants.normalTextStyleOpenSans14
-                                      .copyWith(color: Colors.white),
-                                ),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          }
-                        },
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                              value: "copy",
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Copy information"),
-                                  Icon(
-                                    Icons.copy,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: "delete",
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Delete",
-                                    style: Constants.normalTextStyleOpenSans14,
-                                  ),
-                                  Icon(
-                                    Icons.highlight_remove_outlined,
-                                    color: Colors.red,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ];
-                        },
-                      ),
-
-                      /*Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  coilDao.deleteCoil(coils[index]);
-                                },
-                                icon: Icon(
-                                  Icons.highlight_remove,
-                                  color: Colors.red,
-                                ),
-                              ),
-                              IconButton(
-                                  onPressed: () {
-                                    Clipboard.setData(ClipboardData(
-                                        text: "COIL INFORMATION\n\n"
-                                            "Name: ${coils[index].coilName}\n"
-                                            "Resonant frequency: ${coils[index].resonantFrequency}"));
-                                  },
-                                  icon: Icon(Icons.copy)),
-                            ],
-                          ),*/
+                      trailing: PopupMenu(coilDao: coilDao, coil: coil),
                     ),
                   );
                 },
               );
             }),
       ),
+    );
+  }
+}
+
+class PopupMenu extends StatelessWidget {
+  const PopupMenu({
+    Key? key,
+    required this.coilDao,
+    required this.coil,
+  }) : super(key: key);
+
+  final CoilDao coilDao;
+  final Coil coil;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      onSelected: (text) {
+        if (text == Constants.ACTION_DELETE) {
+          coilDao.deleteCoil(coil);
+        } else if (text == Constants.ACTION_COPY_INFO) {
+          Clipboard.setData(
+            ClipboardData(
+              text: "COIL INFORMATION\n\n"
+                  "Name: ${coil.coilName}\n"
+                  "Resonant frequency: ${coil.primary.frequency}",
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Information copied to clipboard",
+                style: Constants.normalTextStyleOpenSans14
+                    .copyWith(color: Colors.white),
+              ),
+              duration: const Duration(milliseconds: 1500),
+            ),
+          );
+        }
+      },
+      itemBuilder: (context) {
+        return popupCoilButtonActions;
+      },
     );
   }
 }
