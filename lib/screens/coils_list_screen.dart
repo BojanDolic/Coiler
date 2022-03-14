@@ -2,6 +2,8 @@ import 'package:coiler_app/dao/CoilDao.dart';
 import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/entities/SecondaryCoil.dart';
+import 'package:coiler_app/entities/Sparkgap.dart';
 import 'package:coiler_app/screens/coil_info_screen.dart';
 import 'package:coiler_app/util/constants.dart' as Constants;
 import 'package:coiler_app/util/conversion.dart';
@@ -35,11 +37,14 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
 
     coilDao.insertCoil(
       Coil(
-          coilName: coilName,
-          coilDesc: "",
-          coilType: Converter.getCoilType(coilType),
-          primary: PrimaryCoil(coilType: ""),
-          mmcBank: CapacitorBank()),
+        coilName: coilName,
+        coilDesc: "",
+        coilType: Converter.getCoilType(coilType),
+        primary: PrimaryCoil(coilType: ""),
+        secondary: SecondaryCoil(),
+        sparkGap: Sparkgap(),
+        mmcBank: CapacitorBank(),
+      ),
     );
   }
 
@@ -104,7 +109,8 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
               } else if (snapshot.data != null && snapshot.data!.isEmpty) {
                 return const Center(
                   child: Text(
-                    "No data available",
+                    "No coils found\nTry to add new coil !",
+                    textAlign: TextAlign.center,
                     style: Constants.normalTextStyleOpenSans14,
                   ),
                 );

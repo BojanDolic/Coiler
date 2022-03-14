@@ -66,7 +66,7 @@ class _$CoilsDatabase extends CoilsDatabase {
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback? callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
-      version: 13,
+      version: 14,
       onConfigure: (database) async {
         await database.execute('PRAGMA foreign_keys = ON');
         await callback?.onConfigure?.call(database);
@@ -82,7 +82,7 @@ class _$CoilsDatabase extends CoilsDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `mmcBank` TEXT NOT NULL, `coilType` TEXT NOT NULL, `primary` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `mmcBank` TEXT NOT NULL, `coilType` TEXT NOT NULL, `primary` TEXT NOT NULL, `helicalPrimary` TEXT, `secondary` TEXT NOT NULL, `sparkGap` TEXT NOT NULL, `sphereTopload` TEXT, `toroidTopload` TEXT, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -108,7 +108,15 @@ class _$CoilDao extends CoilDao {
                   'coilDesc': item.coilDesc,
                   'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
                   'coilType': item.coilType,
-                  'primary': _primaryCoilConverter.encode(item.primary)
+                  'primary': _primaryCoilConverter.encode(item.primary),
+                  'helicalPrimary':
+                      _helicalPrimaryConverter.encode(item.helicalPrimary),
+                  'secondary': _secondaryCoilConverter.encode(item.secondary),
+                  'sparkGap': _sparkgapConverter.encode(item.sparkGap),
+                  'sphereTopload':
+                      _sphereToploadConverter.encode(item.sphereTopload),
+                  'toroidTopload':
+                      _toroidToploadConverter.encode(item.toroidTopload)
                 },
             changeListener),
         _coilUpdateAdapter = UpdateAdapter(
@@ -121,7 +129,15 @@ class _$CoilDao extends CoilDao {
                   'coilDesc': item.coilDesc,
                   'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
                   'coilType': item.coilType,
-                  'primary': _primaryCoilConverter.encode(item.primary)
+                  'primary': _primaryCoilConverter.encode(item.primary),
+                  'helicalPrimary':
+                      _helicalPrimaryConverter.encode(item.helicalPrimary),
+                  'secondary': _secondaryCoilConverter.encode(item.secondary),
+                  'sparkGap': _sparkgapConverter.encode(item.sparkGap),
+                  'sphereTopload':
+                      _sphereToploadConverter.encode(item.sphereTopload),
+                  'toroidTopload':
+                      _toroidToploadConverter.encode(item.toroidTopload)
                 },
             changeListener),
         _coilDeletionAdapter = DeletionAdapter(
@@ -134,7 +150,15 @@ class _$CoilDao extends CoilDao {
                   'coilDesc': item.coilDesc,
                   'mmcBank': _capacitorBankConverter.encode(item.mmcBank),
                   'coilType': item.coilType,
-                  'primary': _primaryCoilConverter.encode(item.primary)
+                  'primary': _primaryCoilConverter.encode(item.primary),
+                  'helicalPrimary':
+                      _helicalPrimaryConverter.encode(item.helicalPrimary),
+                  'secondary': _secondaryCoilConverter.encode(item.secondary),
+                  'sparkGap': _sparkgapConverter.encode(item.sparkGap),
+                  'sphereTopload':
+                      _sphereToploadConverter.encode(item.sphereTopload),
+                  'toroidTopload':
+                      _toroidToploadConverter.encode(item.toroidTopload)
                 },
             changeListener);
 
@@ -159,7 +183,16 @@ class _$CoilDao extends CoilDao {
             coilDesc: row['coilDesc'] as String,
             coilType: row['coilType'] as String,
             mmcBank: _capacitorBankConverter.decode(row['mmcBank'] as String),
-            primary: _primaryCoilConverter.decode(row['primary'] as String)),
+            primary: _primaryCoilConverter.decode(row['primary'] as String),
+            helicalPrimary: _helicalPrimaryConverter
+                .decode(row['helicalPrimary'] as String?),
+            secondary:
+                _secondaryCoilConverter.decode(row['secondary'] as String),
+            toroidTopload:
+                _toroidToploadConverter.decode(row['toroidTopload'] as String?),
+            sphereTopload:
+                _sphereToploadConverter.decode(row['sphereTopload'] as String?),
+            sparkGap: _sparkgapConverter.decode(row['sparkGap'] as String)),
         queryableName: 'Coil',
         isView: false);
   }
@@ -171,7 +204,7 @@ class _$CoilDao extends CoilDao {
 
   @override
   Future<void> updateCoil(Coil coil) async {
-    await _coilUpdateAdapter.update(coil, OnConflictStrategy.abort);
+    await _coilUpdateAdapter.update(coil, OnConflictStrategy.replace);
   }
 
   @override
@@ -183,3 +216,8 @@ class _$CoilDao extends CoilDao {
 // ignore_for_file: unused_element
 final _capacitorBankConverter = CapacitorBankConverter();
 final _primaryCoilConverter = PrimaryCoilConverter();
+final _helicalPrimaryConverter = HelicalPrimaryConverter();
+final _secondaryCoilConverter = SecondaryCoilConverter();
+final _sparkgapConverter = SparkgapConverter();
+final _toroidToploadConverter = ToroidToploadConverter();
+final _sphereToploadConverter = SphereToploadConverter();

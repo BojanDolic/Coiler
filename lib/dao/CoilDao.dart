@@ -9,7 +9,7 @@ abstract class CoilDao {
   @delete
   Future<void> deleteCoil(Coil coil);
 
-  @update
+  @Update(onConflict: OnConflictStrategy.replace)
   Future<void> updateCoil(Coil coil);
 
   @Query("SELECT * FROM Coil")

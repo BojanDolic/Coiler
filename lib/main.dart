@@ -67,6 +67,9 @@ Future<void> main() async {
         return db.execute(
             'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `mmcBank` TEXT NOT NULL, `coilType` TEXT NOT NULL, `primary` TEXT NOT NULL, PRIMARY KEY (`id`))');
       }),
+      Migration(13, 14, (db) async {
+        return db.execute("DROP TABLE Coil");
+      }),
       //$frequency,$turns,$inductance,$coilType
     ],
   ).build();
