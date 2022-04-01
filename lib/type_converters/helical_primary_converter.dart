@@ -1,26 +1,20 @@
-import 'dart:convert';
-
-import 'package:coiler_app/entities/HelicalPrimary.dart';
-import 'package:floor/floor.dart';
-
-class HelicalPrimaryConverter
-    extends TypeConverter<HelicalPrimaryCoil?, String?> {
+/*class HelicalPrimaryConverter extends TypeConverter<HelicalCoil?, String?> {
   @override
-  HelicalPrimaryCoil? decode(String? databaseValue) {
+  HelicalCoil? decode(String? databaseValue) {
     if (databaseValue == null) {
       return null;
     }
-    return HelicalPrimaryCoil.fromJson(jsonDecode(databaseValue));
+    return HelicalCoil.fromJson(jsonDecode(databaseValue));
   }
 
   @override
-  String? encode(HelicalPrimaryCoil? value) {
+  String? encode(HelicalCoil? value) {
     if (value == null) {
       return null;
     }
     return jsonEncode(value,
-        toEncodable: (Object? value) => value is HelicalPrimaryCoil
-            ? HelicalPrimaryCoil.toJson(value)
+        toEncodable: (Object? value) => value is HelicalCoil
+            ? HelicalCoil.toJson(value)
             : throw UnsupportedError("Cannot convert to value JSON: $value"));
   }
-}
+}*/

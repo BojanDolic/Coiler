@@ -1,14 +1,18 @@
+import 'package:coiler_app/dao/DriftCoilDao.dart';
+import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/screens/calculators_screen.dart';
 import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   static const String id = "/main";
+  //final DriftCoilDao dao;
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +118,26 @@ class MainScreen extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pushNamed(InformationScreen.id);
               },
+            ),
+            TextButton(
+              onPressed: () async {
+                //await dao.insertCoil(Coil(id: null, name: "Testić"));
+                Provider.of<DriftCoilDao>(context, listen: false)
+                    .getCoils()
+                    .listen(
+                  (event) {
+                    if (event.isNotEmpty) {
+                      for (Coil coil in event) {
+                        print(coil.coilInfo.coilName);
+                        print(coil.coilInfo.coilType);
+                      }
+                    } else {
+                      print("Empty");
+                    }
+                  },
+                );
+              },
+              child: Text("TEST DAO"),
             ),
           ],
         ),

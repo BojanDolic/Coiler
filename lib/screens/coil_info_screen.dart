@@ -1,29 +1,27 @@
-import 'package:coiler_app/dao/CoilDao.dart';
-import 'package:coiler_app/entities/CapacitorBank.dart';
+import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
-import 'package:coiler_app/entities/HelicalPrimary.dart';
-import 'package:coiler_app/entities/SecondaryCoil.dart';
-import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
+import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/util/util_functions.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CoilInfoScreen extends StatefulWidget {
-  const CoilInfoScreen({Key? key, required this.coilDao}) : super(key: key);
+  const CoilInfoScreen({Key? key, required this.driftDao}) : super(key: key);
 
   static const String id = "/main/coils/coil_info";
 
-  final CoilDao coilDao;
+  final DriftCoilDao driftDao;
 
   @override
   State<CoilInfoScreen> createState() => _CoilInfoScreenState();
 }
 
 class _CoilInfoScreenState extends State<CoilInfoScreen> {
-  late CoilDao dao;
   final converter = Converter();
 
   bool isEditingInfo = false;
@@ -31,32 +29,32 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
 
   final coilDescController = TextEditingController();
 
-  void updateInfo(Coil coil) async {
+  void updateInfo() async {
     var coilName = coilDescController.text;
 
+    //var currentCoilName = Provider.of<CoilProvider>(context, listen: false).coil.coilInfo.coilName;
     if (coilName.isEmpty) {
       return;
     }
 
-    setState(() {
-      coil.coilDesc = coilName;
-    });
+    Provider.of<CoilProvider>(context, listen: false).coil.coilInfo.coilDesc =
+        coilName.trim();
 
-    dao.updateCoil(coil);
+    Provider.of<DriftCoilDao>(context, listen: false)
+        .updateCoilInfo(Provider.of<CoilProvider>(context, listen: false).coil);
   }
 
   @override
   void initState() {
     super.initState();
-    dao = widget.coilDao;
   }
 
   @override
   Widget build(BuildContext context) {
-    final coil = ModalRoute.of(context)!.settings.arguments as Coil;
-    print(coil.mmcBank);
-    print(coil.mmcBank.capacitance);
-    coilDescController.text = coil.coilDesc;
+    coilDescController.text = Provider.of<CoilProvider>(context, listen: true)
+        .coil
+        .coilInfo
+        .coilDesc; //= coil.coilDesc;
     return Scaffold(
       backgroundColor: const Color(0xFFf9fcff),
       body: SafeArea(
@@ -84,18 +82,21 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                       )
                     : IconButton(
                         onPressed: () async {
-                          updateInfo(coil);
+                          updateInfo();
                           setState(() {
                             isEditingInfo = false;
                           });
                         },
-                        icon: Icon(Icons.check)),
+                        icon: const Icon(Icons.check)),
               ],
               backgroundColor: const Color(0xFFf9fcff),
               flexibleSpace: FlexibleSpaceBar(
                 expandedTitleScale: 2,
                 title: Text(
-                  coil.coilName,
+                  Provider.of<CoilProvider>(context, listen: false)
+                      .coil
+                      .coilInfo
+                      .coilName,
                   maxLines: 1,
                   style: boldCategoryTextStyle.copyWith(color: Colors.black87),
                 ),
@@ -123,83 +124,102 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         children: [
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Project description:",
-                                  textAlign: TextAlign.start,
-                                  style: normalTextStyleOpenSans14,
-                                ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
-                                TextField(
-                                  controller: coilDescController,
-                                  enabled: isEditingInfo,
-                                  autocorrect: false,
-                                  maxLines: null,
-                                  maxLength: isEditingInfo ? 130 : null,
-                                  style: normalTextStyleOpenSans14,
-                                  decoration: InputDecoration(
-                                    hintText:
-                                        (coilDescController.text.isEmpty &&
-                                                !isEditingInfo)
-                                            ? "Project description not provided"
-                                            : "",
-                                    disabledBorder: InputBorder.none,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(9),
-                                    ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Project description:",
+                                textAlign: TextAlign.start,
+                                style: normalTextStyleOpenSans14,
+                              ),
+                              const SizedBox(
+                                height: 6,
+                              ),
+                              TextField(
+                                controller: coilDescController,
+                                enabled: isEditingInfo,
+                                autocorrect: false,
+                                maxLines: null,
+                                maxLength: isEditingInfo ? 130 : null,
+                                style: normalTextStyleOpenSans14,
+                                decoration: InputDecoration(
+                                  hintText: (coilDescController.text.isEmpty &&
+                                          !isEditingInfo)
+                                      ? "Project description not provided"
+                                      : Provider.of<CoilProvider>(context)
+                                          .coil
+                                          .coilInfo
+                                          .coilDesc,
+                                  disabledBorder: InputBorder.none,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(9),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Container(
-                    child: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Coil specifications:",
-                            style: boldCategoryTextStyle,
-                          ),
-                          const SizedBox(
-                            height: 9,
-                          ),
-                          BorderContainer(
-                            child: Column(
-                              children: [
-                                PrimaryFrequencyContainer(
-                                  coil: coil,
-                                ),
-                                SizedBox(
-                                  height: 6,
-                                ),
-                                BorderContainer(
-                                  child: ListTile(
-                                    leading: Image.asset(
-                                      "assets/resfreq_icon.png",
-                                      color: Colors.lightBlue,
-                                      width: 42,
-                                      height: 42,
-                                    ),
-                                    title: const Text("Secondary frequency"),
-                                    subtitle: Text(
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Coil specifications:",
+                          style: boldCategoryTextStyle,
+                        ),
+                        const SizedBox(
+                          height: 9,
+                        ),
+                        Consumer<CoilProvider>(
+                          builder: (context, coilProvider, child) {
+                            return BorderContainer(
+                              child: Column(
+                                children: [
+                                  PrimaryFrequencyContainer(
+                                    primaryCoilTap: () async {
+                                      coilProvider.setPrimaryCoil(
+                                        PrimaryCoil(
+                                            coilType: "HELICAL",
+                                            inductance: 0.000015,
+                                            wireDiameter: 0.040),
+                                      );
+
+                                      Provider.of<DriftCoilDao>(context,
+                                              listen: false)
+                                          .insertPrimary(
+                                              Provider.of<CoilProvider>(context,
+                                                      listen: false)
+                                                  .coil);
+
+                                      //TODO Navigate to add or edit component
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 6,
+                                  ),
+                                  BorderContainer(
+                                    child: ListTile(
+                                      leading: Image.asset(
+                                        "assets/resfreq_icon.png",
+                                        color: Colors.lightBlue,
+                                        width: 42,
+                                        height: 42,
+                                      ),
+                                      title: const Text("Secondary frequency"),
+                                      subtitle: Text(
+                                        "" /*
                                       displayResonantFrequency(
-                                          coil.primary.frequency),
-                                      maxLines: 2,
-                                    ),
-                                    trailing: IconButton(
-                                      onPressed: () async {
-                                        if (hasSecondaryComponents(coil)) {
+                                          coil.primary.frequency)*/
+                                        ,
+                                        maxLines: 2,
+                                      ),
+                                      trailing: IconButton(
+                                        onPressed: () async {
+                                          /*if (hasSecondaryComponents(coil)) {
                                           //TODO NAVIGATE TO FREQUENCY CALCULATION
                                         } else {
                                           ScaffoldMessenger.of(context)
@@ -253,38 +273,44 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               ),
                                             ),
                                           );
-                                        }
-                                      },
-                                      icon: hasSecondaryComponents(coil)
+                                        }*/
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                        //TODO add icon for calculating
+                                        /*icon: hasSecondaryComponents(coil)
                                           ? const Icon(
                                               Icons.calculate_outlined,
                                               color: Colors.lightBlue,
                                             )
-                                          : const Icon(Icons.edit),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
+                                          : const Icon(Icons.edit),*/
+                                      ),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          Visibility(
-                            visible: coil.coilType !=
-                                Converter.getCoilType(CoilType.SSTC),
-                            child: CapBankContainer(coil: coil),
-                          ),
-                        ],
-                      ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Visibility(
+                          visible: Util.isSolidStateCoil(
+                              Provider.of<CoilProvider>(context, listen: false)
+                                  .coil),
+                          child: CapBankContainer(),
+                        ),
+                      ],
                     ),
                   ),
                   Visibility(
-                    visible: coil.coilType ==
-                            Converter.getCoilType(CoilType.SPARK_GAP)
+                    visible: Util.isSparkGapCoil(
+                            Provider.of<CoilProvider>(context, listen: false)
+                                .coil)
                         ? true
                         : false,
                     child: BorderContainer(
@@ -293,25 +319,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                         child: TextButton(
                           child: Text(
                               "Calculate your spark gap distance\nTEST ADD HELICAL PRIMARY !"),
-                          onPressed: () async {
-                            var bank = CapacitorBank(
-                              parallelCapacitorCount: 5,
-                              seriesCapacitorCount: 6,
-                              capacitance: 26.6,
-                            );
-
-                            //coil.mmcBank = bank;
-                            coil.helicalPrimary = HelicalPrimaryCoil(
-                              inductance: 10.1,
-                              turns: 8,
-                              wireSpacing: 0.01,
-                              wireDiameter: 0.8,
-                              coilDiameter: 17,
-                            );
-
-                            await dao.updateCoil(coil);
-                            setState(() {});
-                          },
+                          onPressed: () async {},
                         ),
                       ),
                     ),
@@ -329,115 +337,127 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
 class PrimaryFrequencyContainer extends StatelessWidget {
   const PrimaryFrequencyContainer({
     Key? key,
-    required this.coil,
+    required this.primaryCoilTap,
   }) : super(key: key);
 
-  final Coil coil;
+  final VoidCallback primaryCoilTap;
 
   @override
   Widget build(BuildContext context) {
-    return BorderContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Visibility(
-            visible: !Util.isSolidStateCoil(coil),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 6,
-              ),
-              leading: Image.asset(
-                "assets/resfreq_icon.png",
-                color: Colors.blue,
-                width: 42,
-                height: 42,
-              ),
-              title: const Text("Primary frequency"),
-              subtitle: Text(
-                displayResonantFrequency(coil.primary.frequency),
-                maxLines: 2,
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                  if (hasPrimaryComponents(coil)) {
-                    //TODO NAVIGATE TO FREQUENCY CALCULATION
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "You need to add primary components to calculate resonant frequency",
-                          style: normalTextStyleOpenSans14.copyWith(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                        ),
-                        duration: const Duration(seconds: 4),
-                        backgroundColor:
-                            Colors.blue.shade800, //const Color(0xFFc9383b),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(9),
-                        ),
-                        action: SnackBarAction(
-                            textColor: Colors.white,
-                            label: "ADD",
-                            onPressed: () {
-                              if (coil.primary.inductance == 0) {
-                                //TODO Navigate to secondary coil calculator
-                              } else if (coil.mmcBank.capacitance == 0) {
-                                //TODO Navigate to calculating mmc
-                              }
-                            }),
-                      ),
-                    );
-                  }
-                },
-                icon: Icon(Icons.edit),
-              ),
-            ),
-          ),
-          Visibility(
-            visible: !Util.isSolidStateCoil(coil),
-            child: const SizedBox(
-              height: 6,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Consumer<CoilProvider>(
+      builder: (context, coilProvider, child) {
+        return BorderContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Visibility(
-                visible: !Util.isSolidStateCoil(coil),
-                child: CoilComponentWidget(
-                  assetName: "assets/caps_icon.png",
-                  value: getBankCapText(coil),
-                  title: "MMC",
-                  backgroundColor: Colors.blue,
-                  isComponentAdded: !(getBankCapText(coil) == "Not added"),
-                  onTap: () {
-                    //TODO Navigate to add or edit component
-                  },
+                visible: !Util.isSolidStateCoil(
+                    Provider.of<CoilProvider>(context, listen: false).coil),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                  ),
+                  leading: Image.asset(
+                    "assets/resfreq_icon.png",
+                    color: Colors.blue,
+                    width: 42,
+                    height: 42,
+                  ),
+                  title: const Text("Primary frequency"),
+                  subtitle: Text(
+                    "",
+                    //displayResonantFrequency(coil.primary.frequency),
+                    maxLines: 2,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      if (Util.hasPrimary(
+                          Provider.of<CoilProvider>(context, listen: false)
+                              .coil)) {
+                        //TODO NAVIGATE TO FREQUENCY CALCULATION
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "You need to add primary components to calculate resonant frequency",
+                              style: normalTextStyleOpenSans14.copyWith(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                            duration: const Duration(seconds: 4),
+                            backgroundColor:
+                                Colors.blue.shade800, //const Color(0xFFc9383b),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            action: SnackBarAction(
+                                textColor: Colors.white,
+                                label: "ADD",
+                                onPressed: () {
+                                  /*if (coil.primary.inductance == 0) {
+                                  //TODO Navigate to secondary coil calculator
+                                } else if (coil.mmcBank.capacitance == 0) {
+                                  //TODO Navigate to calculating mmc
+                                }*/
+                                }),
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.edit),
+                  ),
                 ),
               ),
-              const SizedBox(
-                width: 9,
+              Visibility(
+                visible: !Util.isSolidStateCoil(
+                    Provider.of<CoilProvider>(context, listen: false).coil),
+                child: const SizedBox(
+                  height: 6,
+                ),
               ),
-              CoilComponentWidget(
-                title: "Primary coil",
-                value: hasHelicalCoil(coil)
-                    ? "${coil.helicalPrimary!.inductance} uH"
-                    : "Not added",
-                assetName: "assets/helical_coil_icon.png",
-                backgroundColor: Colors.orange,
-                isComponentAdded: hasHelicalCoil(coil),
-                onTap: () {
-                  //TODO Navigate to add or edit component
-                },
-              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Visibility(
+                    visible: !Util.isSolidStateCoil(
+                        Provider.of<CoilProvider>(context, listen: false).coil),
+                    child: CoilComponentWidget(
+                      assetName: "assets/caps_icon.png",
+                      value: "", //getBankCapText(coil),
+                      title: "MMC",
+                      backgroundColor: Colors.blue,
+                      isComponentAdded:
+                          true, //!(getBankCapText(coil) == "Not added"),
+                      onTap: () {
+                        //TODO Navigate to add or edit component
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 9,
+                  ),
+                  CoilComponentWidget(
+                    title: "Primary coil",
+                    value: hasHelicalCoil(
+                            Provider.of<CoilProvider>(context, listen: true)
+                                .coil)
+                        ? "${Converter().convertUnits(coilProvider.coil.primaryCoil?.inductance, Units.DEFAULT, Units.MICRO).toStringAsFixed(4)} uH"
+                        : "Not added",
+                    assetName: "assets/helical_coil_icon.png",
+                    backgroundColor: Colors.orange,
+                    isComponentAdded: hasHelicalCoil(
+                        Provider.of<CoilProvider>(context, listen: true).coil),
+                    onTap: primaryCoilTap,
+                  ),
+                ],
+              )
             ],
-          )
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -468,39 +488,39 @@ class CoilComponentWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.only(
-            bottom: 6,
-          ),
+          padding: const EdgeInsets.all(6),
           child: Column(
             children: [
-              Stack(
-                children: [
-                  Container(
-                    width: 90,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      color: isComponentAdded
-                          ? (backgroundColor ?? Colors.white38)
-                          : Colors.white54,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
+              isComponentAdded
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ),
-                  isComponentAdded
-                      ? Image.asset(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(
                           assetName,
                           width: 36,
                           height: 36,
                           color: Colors.white,
-                        )
-                      : const Icon(
-                          Icons.add,
                         ),
-                ],
-                alignment: Alignment.center,
-              ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.add,
+                          size: 36,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
               const SizedBox(
                 height: 6,
               ),
@@ -520,10 +540,7 @@ class CoilComponentWidget extends StatelessWidget {
 class CapBankContainer extends StatelessWidget {
   const CapBankContainer({
     Key? key,
-    required this.coil,
   }) : super(key: key);
-
-  final Coil coil;
 
   @override
   Widget build(BuildContext context) {
@@ -537,8 +554,9 @@ class CapBankContainer extends StatelessWidget {
         ),
         title: Text("MMC capacitance"),
         subtitle: Text(
-          coil.mmcBank.capacitance.toStringAsFixed(4) + " nF",
-        ),
+            "No data" //coil.mmcBank.capacitance.toStringAsFixed(4) + " nF",
+            //TODO Add MMC capacitance
+            ),
       ),
     );
   }
@@ -556,30 +574,33 @@ String displayResonantFrequency(double freq) {
   return resFreqText;
 }
 
-String getBankCapText(Coil coil) {
+/*String getBankCapText(Coil coil) {
   if (coil.mmcBank.capacitance == 0) {
     return "Not added";
   } else {
     return coil.mmcBank.capacitance.toStringAsFixed(2);
   }
-}
+}*/
 
-bool hasSecondaryComponents(Coil coil) {
+/*bool hasSecondaryComponents(Coil coil) {
   return (coil.secondary.inductance != 0 &&
       (coil.sphereTopload != null || coil.toroidTopload != null));
-}
+}*/
 
-bool hasPrimaryComponents(Coil coil) {
+/*bool hasPrimaryComponents(Coil coil) {
   if (coil.coilType == Converter.getCoilType(CoilType.DRSSTC) ||
       coil.coilType == Converter.getCoilType(CoilType.SPARK_GAP)) {
-    return (coil.helicalPrimary != null && coil.mmcBank.capacitance != 0);
+    //return (coil.helicalPrimary != null && coil.mmcBank.capacitance != 0);
+    return true;
   } else if (coil.coilType == Converter.getCoilType(CoilType.SSTC)) {
-    return (coil.helicalPrimary != null ||
-        coil.helicalPrimary != null); //TODO Needs to be flat coil check
+    return true;
+    */ /*return (coil.helicalPrimary != null ||
+        coil.helicalPrimary != null); //TODO Needs to be flat coil check*/ /*
   }
   return false;
-}
+}*/
 
 bool hasHelicalCoil(Coil coil) {
-  return (coil.helicalPrimary != null);
+  return (coil.primaryCoil != null && coil.primaryCoil?.coilType == "HELICAL");
+  //return (coil.helicalPrimary != null);
 }

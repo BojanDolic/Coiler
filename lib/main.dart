@@ -1,5 +1,7 @@
-import 'package:coiler_app/dao/CoilDao.dart';
-import 'package:coiler_app/database/coil_database.dart';
+import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
+import 'package:coiler_app/dao/DriftCoilDao.dart';
+import 'package:coiler_app/database/drift_coil_database.dart';
+import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
@@ -9,82 +11,52 @@ import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/screens/main_screen.dart';
 import 'package:coiler_app/util/constants.dart';
-import 'package:floor/floor.dart';
+import 'package:drift/native.dart';
+import 'package:drift_local_storage_inspector/drift_local_storage_inspector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:storage_inspector/storage_inspector.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await $FloorCoilsDatabase
-      .databaseBuilder("coils_database.db")
-      .addMigrations(
-    [
-      Migration(
-        6,
-        7,
-        (db) {
-          return db.update("Coil", {"coilType": ""});
-        },
+  //final driftDao = DriftCoilDatabase();
+
+  final driver = StorageServerDriver(
+      bundleId: 'com.electrocoder.coiler.coiler_app', port: 0);
+
+  final db = NativeDatabase.memory();
+  final driftDb = DriftCoilDatabase(db);
+
+  final res = await driftDb.customSelect("SELECT sql FROM sqlite_schema").get();
+
+  final sqlServer =
+      DriftSQLDatabaseServer(id: "1", name: "SQL Server", database: driftDb);
+
+  driver.addSQLServer(sqlServer);
+
+  await driver.start();
+
+  driftDb.driftCoilDao;
+
+  runApp(MultiProvider(
+    providers: [
+      Provider<DriftCoilDao>(
+        create: (context) => driftDb.driftCoilDao,
       ),
-      Migration(
-        7,
-        8,
-        (db) {
-          return db.execute(
-              "ALTER TABLE Coil ADD COLUMN mmcBank TEXT NOT NULL DEFAULT \'0,0,\'");
-        },
-      ),
-      Migration(
-        8,
-        9,
-        (db) {
-          return db.setVersion(9);
-        },
-      ),
-      Migration(
-        9,
-        10,
-        (db) {
-          return db.setVersion(10);
-        },
-      ),
-      Migration(
-        10,
-        11,
-        (db) async {
-          await db.execute("DROP TABLE Coil");
-        },
-      ),
-      Migration(
-        11,
-        12,
-        (db) async {
-          await db.setVersion(12);
-        },
-      ),
-      Migration(12, 13, (db) async {
-        return db.execute(
-            'CREATE TABLE IF NOT EXISTS `Coil` (`id` INTEGER, `coilName` TEXT NOT NULL, `coilDesc` TEXT NOT NULL, `mmcBank` TEXT NOT NULL, `coilType` TEXT NOT NULL, `primary` TEXT NOT NULL, PRIMARY KEY (`id`))');
-      }),
-      Migration(13, 14, (db) async {
-        return db.execute("DROP TABLE Coil");
-      }),
-      //$frequency,$turns,$inductance,$coilType
+      ChangeNotifierProvider<CoilProvider>(create: (context) => CoilProvider()),
     ],
-  ).build();
-
-  final coilsDao = database.coilDao;
-
-  runApp(MyApp(
-    dao: coilsDao,
+    child: MyApp(
+      driftDao: driftDb.driftCoilDao,
+    ),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key, required this.dao}) : super(key: key);
+  const MyApp({Key? key, required this.driftDao}) : super(key: key);
 
-  final CoilDao dao;
+  final DriftCoilDao driftDao;
 
   @override
   Widget build(BuildContext context) {
@@ -101,22 +73,33 @@ class MyApp extends StatelessWidget {
         ),
       ),
       routes: {
-        MainScreen.id: (context) => const MainScreen(),
+        MainScreen.id: (context) => MainScreen(
+            // dao: driftDao,
+            ),
         CalculatorsScreen.id: (context) => const CalculatorsScreen(),
         CapacitorScreen.id: (context) => const CapacitorScreen(),
         ResonantFrequencyScreen.id: (context) =>
             const ResonantFrequencyScreen(),
-        HelicalCoilCalculatorScreen.id: (context) =>
-            const HelicalCoilCalculatorScreen(),
-        CoilsListScreen.id: (context) => CoilsListScreen(
-              coilDao: dao,
-            ),
+        /*HelicalCoilCalculatorScreen.id: (context) =>
+            const HelicalCoilCalculatorScreen(),*/
+        CoilsListScreen.id: (context) => const CoilsListScreen(),
         CoilInfoScreen.id: (context) => CoilInfoScreen(
-              coilDao: dao,
+              driftDao: driftDao,
             ),
         InformationScreen.id: (context) => const InformationScreen(),
       },
       initialRoute: MainScreen.id,
+      onGenerateRoute: (settings) {
+        if (settings.name == HelicalCoilCalculatorScreen.id) {
+          final args = settings.arguments as HelicalCoilArgs?;
+
+          return MaterialPageRoute(builder: (context) {
+            return HelicalCoilCalculatorScreen(
+              args: args,
+            );
+          });
+        }
+      },
     );
   }
 }

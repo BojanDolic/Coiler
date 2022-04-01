@@ -1,21 +1,16 @@
-import 'package:coiler_app/dao/CoilDao.dart';
-import 'package:coiler_app/entities/CapacitorBank.dart';
+import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
-import 'package:coiler_app/entities/PrimaryCoil.dart';
-import 'package:coiler_app/entities/SecondaryCoil.dart';
-import 'package:coiler_app/entities/Sparkgap.dart';
+import 'package:coiler_app/entities/CoilInfo.dart';
+import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/coil_info_screen.dart';
 import 'package:coiler_app/util/constants.dart' as Constants;
 import 'package:coiler_app/util/conversion.dart';
-import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/widgets/create_coil_dialog_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class CoilsListScreen extends StatefulWidget {
-  const CoilsListScreen({Key? key, required this.coilDao}) : super(key: key);
-
-  final CoilDao coilDao;
+  const CoilsListScreen({Key? key}) : super(key: key);
 
   static const String id = "/main/coils";
 
@@ -24,8 +19,6 @@ class CoilsListScreen extends StatefulWidget {
 }
 
 class _CoilsListScreenState extends State<CoilsListScreen> {
-  late CoilDao coilDao;
-
   String coilName = "";
   var coilType = Constants.CoilType.SPARK_GAP;
   final dialogFormKey = GlobalKey<FormState>();
@@ -35,7 +28,13 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   void createCoil() async {
     var coilName = coilNameController.text;
 
-    coilDao.insertCoil(
+    Coil coil = Coil();
+    coil.coilInfo =
+        CoilInfo(coilName: coilName, coilType: Converter.getCoilType(coilType));
+
+    Provider.of<DriftCoilDao>(context, listen: false).insertCoil(coil);
+
+    /*var coilId = await coilDao.insertCoil(
       Coil(
         coilName: coilName,
         coilDesc: "",
@@ -46,6 +45,10 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
         mmcBank: CapacitorBank(),
       ),
     );
+
+    coilDao.insertPrimary(
+      HelicalPrimaryBase(coilId: coilId),
+    );*/
   }
 
   Widget openDialog() {
@@ -80,7 +83,6 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   @override
   void initState() {
     super.initState();
-    coilDao = widget.coilDao;
   }
 
   @override
@@ -101,7 +103,8 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
       ),
       body: SafeArea(
         child: StreamBuilder<List<Coil>>(
-            stream: coilDao.getCoils(),
+            stream:
+                Provider.of<DriftCoilDao>(context, listen: false).getCoils(),
             initialData: [],
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -129,9 +132,10 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                     ),
                     child: ListTile(
                       onTap: () {
+                        Provider.of<CoilProvider>(context, listen: false).coil =
+                            coil;
                         Navigator.pushNamed(context, CoilInfoScreen.id,
                             arguments: coil);
-                        //TODO Navigate to coil screen
                       },
                       tileColor: Colors.white,
                       shape: RoundedRectangleBorder(
@@ -144,14 +148,14 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                         height: 46,
                       ),
                       title: Text(
-                        coil.coilName,
+                        coil.coilInfo.coilName,
                         style: Constants.boldCategoryTextStyle,
                       ),
                       subtitle: Text(
-                        coil.coilDesc,
+                        coil.coilInfo.coilDesc,
                         style: Constants.lightCategoryTextStyle,
                       ),
-                      trailing: PopupMenu(coilDao: coilDao, coil: coil),
+                      //trailing: PopupMenu(coilDao: coilDao, coil: coil),
                     ),
                   );
                 },
@@ -162,7 +166,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   }
 }
 
-class PopupMenu extends StatelessWidget {
+/*lass PopupMenu extends StatelessWidget {
   const PopupMenu({
     Key? key,
     required this.coilDao,
@@ -184,10 +188,10 @@ class PopupMenu extends StatelessWidget {
         } else if (text == Constants.ACTION_COPY_INFO) {
           Clipboard.setData(
             ClipboardData(
-              text: "COIL INFORMATION\n\n"
-                  "Name: ${coil.coilName}\n"
-                  "Resonant frequency: ${coil.primary.frequency}",
-            ),
+                text: "COIL INFORMATION\n\n"
+                    "Name: ${coil.coilName}\n"
+                //"Resonant frequency: ${coil.primary.frequency}",
+                ),
           );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -206,4 +210,4 @@ class PopupMenu extends StatelessWidget {
       },
     );
   }
-}
+}*/

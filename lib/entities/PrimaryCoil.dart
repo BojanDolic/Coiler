@@ -1,4 +1,5 @@
 class PrimaryCoil {
+  int? id;
   String coilType;
   int turns;
   double frequency;
@@ -11,6 +12,7 @@ class PrimaryCoil {
   double innerDiameter;
 
   PrimaryCoil({
+    this.id,
     this.coilType = "",
     this.turns = 0,
     this.frequency = 0.0,

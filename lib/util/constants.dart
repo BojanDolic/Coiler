@@ -33,6 +33,10 @@ const lightBlueColor = Color(0xffe1efff);
 
 enum Units { DEFAULT, CENTI, MILI, MICRO, NANO, PICO, KILO, MEGA, GIGA }
 enum CoilType { SPARK_GAP, SSTC, DRSSTC }
+enum INDUCTOR_TYPE {
+  HELICAL,
+  FLAT,
+}
 
 const ACTION_DELETE = "delete";
 const ACTION_COPY_INFO = "copy";
