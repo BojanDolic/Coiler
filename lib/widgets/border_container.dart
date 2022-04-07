@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 ///
 ///
 class BorderContainer extends StatelessWidget {
-  const BorderContainer(
-      {Key? key, this.child, this.backgroundImage, this.elevated})
-      : super(key: key);
+  const BorderContainer({
+    Key? key,
+    this.child,
+    this.backgroundImage,
+    this.elevated,
+    this.padding = const EdgeInsets.all(9),
+  }) : super(key: key);
 
   final Widget? child;
   final String? backgroundImage;
   final bool? elevated;
+  final EdgeInsets padding;
 
   static const List<BoxShadow> shadows = [
     BoxShadow(
@@ -23,22 +28,25 @@ class BorderContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(9),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: (elevated != null && elevated != false) ? shadows : [],
-        border: Border.all(color: Colors.black26),
-        borderRadius: BorderRadius.circular(16),
-        image: backgroundImage != null
-            ? DecorationImage(
-                opacity: 0.04,
-                fit: BoxFit.contain,
-                image: AssetImage(backgroundImage ?? ""),
-              )
-            : null,
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          boxShadow: (elevated != null && elevated != false) ? shadows : [],
+          border: Border.all(color: Colors.black26),
+          borderRadius: BorderRadius.circular(16),
+          image: backgroundImage != null
+              ? DecorationImage(
+                  opacity: 0.04,
+                  fit: BoxFit.contain,
+                  image: AssetImage(backgroundImage ?? ""),
+                )
+              : null,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

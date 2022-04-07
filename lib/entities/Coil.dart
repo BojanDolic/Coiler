@@ -1,0 +1,17 @@
+import 'package:coiler_app/database/drift_coil_database.dart';
+import 'package:coiler_app/entities/CoilInfo.dart';
+import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/entities/SecondaryCoil.dart';
+import 'package:coiler_app/entities/Topload.dart';
+
+class Coil {
+  int? id;
+  CoilInfo coilInfo;
+  PrimaryCoil? primaryCoil;
+  SecondaryCoil? secondaryCoil;
+  CapacitorBank? mmc;
+  Topload? topload;
+
+  Coil({this.id, this.primaryCoil, this.secondaryCoil, this.mmc, this.topload})
+      : coilInfo = CoilInfo();
+}
