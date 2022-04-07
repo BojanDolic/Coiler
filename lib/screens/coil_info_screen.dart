@@ -1,3 +1,4 @@
+import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
@@ -34,10 +35,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   late FocusNode _descriptionFocusNode;
 
   final scrollController = ScrollController();
-
-  /* final _componentActionDialogItems = [
-
-  ];*/
 
   late DialogCallbacks dialogCallbacks;
 
@@ -279,7 +276,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
                                               return;
                                             }
 
-                                            openCoilSelectDialog(context);
+                                            openCoilSelectDialog();
                                           }
 
                                           if (action == DialogAction.onInformation) {
@@ -423,6 +420,73 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
         ),
       ),
     );
+  }
+
+  void openCoilSelectDialog({bool coilFromChange = false}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Center(
+              child: Text(
+                "Select coil type",
+                style: normalTextStyleOpenSans14,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DialogCategoryWidget(
+                  text: 'Flat coil',
+                  imageAsset: 'assets/flat_coil_icon.png',
+                  color: Colors.orangeAccent,
+                  onTap: () {
+                    Navigator.pop(context);
+                    SnackbarUtil.showInfoSnackBar(context: context, text: "Currenty unavailable");
+                  },
+                ),
+                const SizedBox(
+                  height: 6,
+                ),
+                DialogCategoryWidget(
+                  text: 'Helical coil',
+                  imageAsset: 'assets/helical_coil_icon.png',
+                  color: Colors.orangeAccent,
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    if (coilFromChange) {
+                      if (Provider.of<CoilProvider>(context, listen: false).coil.primaryCoil?.coilType == ComponentType.helicalCoil.index) {
+                        //TODO return message that current coil type is the same as selected type
+                      } else {}
+                    }
+
+                    navigateToPrimaryCoilScreen();
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void navigateToPrimaryCoilScreen() async {
+    final args = HelicalCoilArgs(null, true);
+
+    final PrimaryCoil? primaryCoil = (await Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id, arguments: args)) as PrimaryCoil;
+
+    if (primaryCoil == null) {
+      return;
+    }
+
+    final coilProvider = Provider.of<CoilProvider>(context, listen: false);
+
+    coilProvider.setPrimaryCoil(primaryCoil);
+    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
   }
 
   @override
@@ -857,63 +921,6 @@ void openInformationDialog(BuildContext context) {
       return AlertDialog();
     },
   );
-}
-
-void openCoilSelectDialog(BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Center(
-            child: Text(
-              "Select coil type",
-              style: normalTextStyleOpenSans14,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DialogCategoryWidget(
-                text: 'Flat coil',
-                imageAsset: 'assets/flat_coil_icon.png',
-                color: Colors.orangeAccent,
-                onTap: () {
-                  Navigator.pop(context);
-                  SnackbarUtil.showInfoSnackBar(context: context, text: "Currenty unavailable");
-                },
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              DialogCategoryWidget(
-                text: 'Helical coil',
-                imageAsset: 'assets/helical_coil_icon.png',
-                color: Colors.orangeAccent,
-                onTap: () {
-                  Navigator.pop(context);
-                  navigateToPrimaryCoilScreen(context);
-                },
-              ),
-            ],
-          ),
-        );
-      });
-}
-
-void navigateToPrimaryCoilScreen(BuildContext context) async {
-  final PrimaryCoil? primaryCoil = await Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id) as PrimaryCoil;
-
-  if (primaryCoil == null) {
-    return;
-  }
-
-  final provider = Provider.of<CoilProvider>(context);
-
-  provider.setPrimaryCoil(primaryCoil);
 }
 
 class DialogCategoryWidget extends StatelessWidget {
