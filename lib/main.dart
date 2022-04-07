@@ -45,7 +45,9 @@ Future<void> main() async {
       Provider<DriftCoilDao>(
         create: (context) => driftDb.driftCoilDao,
       ),
-      ChangeNotifierProvider<CoilProvider>(create: (context) => CoilProvider()),
+      ChangeNotifierProvider<CoilProvider>(
+        create: (context) => CoilProvider(),
+      ),
     ],
     child: MyApp(
       driftDao: driftDb.driftCoilDao,
@@ -61,19 +63,38 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
       theme: ThemeData(
         appBarTheme: AppBarTheme(
           titleTextStyle:
               normalTextStyleOpenSans14.copyWith(color: Colors.black87),
           toolbarTextStyle:
               normalTextStyleOpenSans14.copyWith(color: Colors.black87),
-          iconTheme: IconThemeData(
+          iconTheme: const IconThemeData(
             color: Colors.black87,
           ),
         ),
+        backgroundColor: lightThemeBackgroundColor,
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Color(0xFF2e2e2e),
+          contentTextStyle: normalSnackbarTextStyleOpenSans14,
+        ),
+      ),
+      darkTheme: ThemeData(
+        appBarTheme: AppBarTheme(
+          titleTextStyle:
+              normalTextStyleOpenSans14.copyWith(color: Colors.black87),
+          toolbarTextStyle:
+              normalTextStyleOpenSans14.copyWith(color: Colors.black87),
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.grey.shade900,
       ),
       routes: {
-        MainScreen.id: (context) => MainScreen(
+        MainScreen.id: (context) => const MainScreen(
             // dao: driftDao,
             ),
         CalculatorsScreen.id: (context) => const CalculatorsScreen(),

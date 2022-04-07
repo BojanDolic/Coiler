@@ -40,6 +40,9 @@ class Converter {
     return result;
   }
 
+  double convertToMicro(dynamic value) =>
+      convertUnits(value, Units.DEFAULT, Units.MICRO);
+
   static String getCoilType(CoilType coilType) {
     switch (coilType) {
       case CoilType.SPARK_GAP:
@@ -48,6 +51,23 @@ class Converter {
         return "DRSSTC";
       case CoilType.SSTC:
         return "SSTC";
+    }
+  }
+
+  static String getCoilComponentType(ComponentType type) {
+    switch (type) {
+      case ComponentType.helicalCoil:
+        return "HELICAL";
+      case ComponentType.flatCoil:
+        return "FLAT";
+      case ComponentType.capacitor:
+        return "CAPACITOR";
+      case ComponentType.ringToroidTopload:
+        return "RING_TOROID";
+      case ComponentType.fullToroidTopload:
+        return "SOLID_TOROID";
+      case ComponentType.sphereTopload:
+        return "SPHERE";
     }
   }
 }

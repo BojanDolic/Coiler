@@ -5,8 +5,10 @@ import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/coil_info_screen.dart';
 import 'package:coiler_app/util/constants.dart' as Constants;
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/widgets/create_coil_dialog_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class CoilsListScreen extends StatefulWidget {
@@ -69,9 +71,9 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
         },
         onAddClick: () async {
           if (dialogFormKey.currentState!.validate()) {
-            setState(() {
-              createCoil();
-            });
+            //setState(() {
+            createCoil();
+            //});
             coilNameController.clear();
             Navigator.pop(context);
           }
@@ -87,6 +89,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final coilDaoProvider = Provider.of<DriftCoilDao>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         isExtended: true,
@@ -103,8 +106,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
       ),
       body: SafeArea(
         child: StreamBuilder<List<Coil>>(
-            stream:
-                Provider.of<DriftCoilDao>(context, listen: false).getCoils(),
+            stream: coilDaoProvider.getCoils(),
             initialData: [],
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -155,7 +157,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                         coil.coilInfo.coilDesc,
                         style: Constants.lightCategoryTextStyle,
                       ),
-                      //trailing: PopupMenu(coilDao: coilDao, coil: coil),
+                      trailing: PopupMenu(coil: coil),
                     ),
                   );
                 },
@@ -166,14 +168,12 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   }
 }
 
-/*lass PopupMenu extends StatelessWidget {
+class PopupMenu extends StatelessWidget {
   const PopupMenu({
     Key? key,
-    required this.coilDao,
     required this.coil,
   }) : super(key: key);
 
-  final CoilDao coilDao;
   final Coil coil;
 
   @override
@@ -184,12 +184,12 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
       ),
       onSelected: (text) {
         if (text == Constants.ACTION_DELETE) {
-          coilDao.deleteCoil(coil);
+          Provider.of<DriftCoilDao>(context, listen: false).deleteCoil(coil);
         } else if (text == Constants.ACTION_COPY_INFO) {
           Clipboard.setData(
             ClipboardData(
                 text: "COIL INFORMATION\n\n"
-                    "Name: ${coil.coilName}\n"
+                    "Name: ${coil.coilInfo.coilName}\n"
                 //"Resonant frequency: ${coil.primary.frequency}",
                 ),
           );
@@ -210,4 +210,4 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
       },
     );
   }
-}*/
+}

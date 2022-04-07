@@ -3,11 +3,13 @@ class CapacitorBank {
   int seriesCapacitorCount;
   int parallelCapacitorCount;
   double capacitance;
+  String capacitorName;
 
   CapacitorBank({
     this.capacitance = 0.0,
     this.seriesCapacitorCount = 0,
     this.parallelCapacitorCount = 0,
+    this.capacitorName = "",
   });
 
   /*CapacitorBank.empty2() {
@@ -16,7 +18,7 @@ class CapacitorBank {
     capacitance = 0;
   }*/
 
-  factory CapacitorBank.fromDatabase(String databaseValue) {
+  /*factory CapacitorBank.fromDatabase(String databaseValue) {
     var valuesList = databaseValue.split(",");
     return CapacitorBank(
       capacitance: double.parse(
@@ -32,5 +34,5 @@ class CapacitorBank {
   }
 
   String toDatabaseString() =>
-      "$capacitance,$seriesCapacitorCount,$parallelCapacitorCount,";
+      "$capacitance,$seriesCapacitorCount,$parallelCapacitorCount,";*/
 }

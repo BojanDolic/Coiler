@@ -1,6 +1,6 @@
 class PrimaryCoil {
   int? id;
-  String coilType;
+  int coilType;
   int turns;
   double frequency;
   double inductance;
@@ -13,7 +13,7 @@ class PrimaryCoil {
 
   PrimaryCoil({
     this.id,
-    this.coilType = "",
+    this.coilType = 0,
     this.turns = 0,
     this.frequency = 0.0,
     this.inductance = 0.0,
@@ -23,7 +23,7 @@ class PrimaryCoil {
     this.innerDiameter = 0.0,
   });
 
-  factory PrimaryCoil.fromDatabase(String databaseValue) {
+  /* factory PrimaryCoil.fromDatabase(String databaseValue) {
     var list = databaseValue.split(",");
     return PrimaryCoil(
       frequency: double.parse(list[0]),
@@ -31,7 +31,7 @@ class PrimaryCoil {
       inductance: double.parse(list[2]),
       coilType: list[3],
     );
-  }
+  }*/
 
   String toDatabaseString() => "$frequency,$turns,$inductance,$coilType";
 }

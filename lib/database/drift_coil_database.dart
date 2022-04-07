@@ -10,7 +10,8 @@ part 'drift_coil_database.g.dart';
 
 @DataClassName("TeslaCoil")
 class Teslacoils extends Table {
-  IntColumn get id => integer().nullable().autoIncrement()();
+  IntColumn get id =>
+      integer().nullable().autoIncrement().customConstraint("UNIQUE")();
   TextColumn get type => text()();
   TextColumn get name => text()();
   TextColumn get description => text()();
@@ -21,19 +22,30 @@ class Teslacoils extends Table {
 @DataClassName("CoilForm")
 class Coils extends Table {
   IntColumn get id => integer().nullable().autoIncrement()();
-  IntColumn get primary_id => integer()
-      .customConstraint("UNIQUE")
-      .nullable()
-      .references(Teslacoils, #id)(); //.references(Teslacoils, #id)();
-  IntColumn get secondary_id => integer()
-      .customConstraint("UNIQUE")
-      .nullable()
-      .references(Teslacoils, #id)(); //.references(Teslacoils, #id)();
-  TextColumn get type => text()();
+  IntColumn get primary_id => integer().nullable().customConstraint(
+      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get secondary_id => integer().nullable().customConstraint(
+      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get type => integer()();
   RealColumn get inductance => real()();
   RealColumn get wireDiamter => real()();
   RealColumn get wireSpacing => real()();
   RealColumn get coilDiameter => real()();
+}
+
+class CapacitorBank extends Table {
+  IntColumn get id => integer().nullable().autoIncrement()();
+  IntColumn get coil_id => integer().nullable().customConstraint(
+      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  RealColumn get capacitance => real()();
+  IntColumn get voltage => integer()();
+  IntColumn get seriesCapacitorCount => integer()();
+  IntColumn get parallelCapacitorCount => integer()();
+  TextColumn get capacitorName => text().withDefault(const Constant(""))();
+}
+
+class Toploads extends Table {
+  IntColumn get id => integer().nullable().autoIncrement()();
 }
 
 @DriftDatabase(tables: [Teslacoils, Coils], daos: [DriftCoilDao])
@@ -44,12 +56,30 @@ class DriftCoilDatabase extends _$DriftCoilDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration =>
+      MigrationStrategy(beforeOpen: (details) async {
+        /* print(
+            "FOREIGN KEYS ENABLED: ${customSelect('PRAGMA foreign_keys;').getSingle().}");*/
+
+        await customSelect('PRAGMA foreign_keys;')
+            .getSingle()
+            .then((value) => print(value.data));
+
+        await customStatement('PRAGMA foreign_keys = ON;');
+
+        await customSelect('PRAGMA foreign_keys;')
+            .getSingle()
+            .then((value) => print(value.data));
+      });
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, "drift_coil_database.db"));
-    return NativeDatabase(file);
+    final database = NativeDatabase(file);
+    return database;
   });
 }

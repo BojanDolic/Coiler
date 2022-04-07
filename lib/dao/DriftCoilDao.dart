@@ -2,6 +2,7 @@ import 'package:coiler_app/database/drift_coil_database.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/CoilInfo.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/util/constants.dart';
 import 'package:drift/drift.dart';
 
 part 'DriftCoilDao.g.dart';
@@ -29,18 +30,22 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase>
     });
   }
 
+  Future deleteCoil(Coil coil) {
+    return (delete(teslacoils)..where((tbl) => tbl.id.equals(coil.id))).go();
+  }
+
   Future insertPrimary(Coil fullCoil) {
     return (into(coils).insert(
-      CoilForm(
-        primary_id: fullCoil.id,
-        secondary_id: null,
-        type: 'HELICAL',
-        inductance: fullCoil.primaryCoil?.inductance ?? 0.0,
-        wireDiamter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
-        wireSpacing: fullCoil.primaryCoil?.wireSpacing ?? 0.0,
-        coilDiameter: fullCoil.primaryCoil?.coilDiameter ?? 0.0,
-      ),
-    ));
+        CoilForm(
+          primary_id: fullCoil.id,
+          secondary_id: null,
+          type: fullCoil.primaryCoil?.coilType ?? -1,
+          inductance: fullCoil.primaryCoil?.inductance ?? 0.0,
+          wireDiamter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
+          wireSpacing: fullCoil.primaryCoil?.wireSpacing ?? 0.0,
+          coilDiameter: fullCoil.primaryCoil?.coilDiameter ?? 0.0,
+        ),
+        mode: InsertMode.insertOrIgnore));
     //onConflict: DoUpdate((old) => );
   }
 
@@ -96,6 +101,13 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase>
                   coilType: primary.type,
                   inductance: primary.inductance,
                 );
+
+                print("COMPONENT TYPES");
+                print(ComponentType.helicalCoil);
+                print(ComponentType.flatCoil);
+                print(ComponentType.fullToroidTopload);
+
+                print(ComponentType.values[3]);
 
                 fullCoil.primaryCoil = _primaryCoil;
               }
