@@ -25,7 +25,7 @@ class CoilInfoScreen extends StatefulWidget {
   State<CoilInfoScreen> createState() => _CoilInfoScreenState();
 }
 
-class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallbacks {
+class _CoilInfoScreenState extends State<CoilInfoScreen> {
   final converter = Converter();
 
   bool isEditingInfo = false;
@@ -35,8 +35,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   late FocusNode _descriptionFocusNode;
 
   final scrollController = ScrollController();
-
-  late DialogCallbacks dialogCallbacks;
 
   void updateInfo() async {
     var coilName = coilDescController.text;
@@ -53,7 +51,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   void initState() {
     super.initState();
     _descriptionFocusNode = FocusNode();
-    dialogCallbacks = this;
   }
 
   @override
@@ -475,7 +472,10 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   }
 
   void navigateToPrimaryCoilScreen() async {
-    final args = HelicalCoilArgs(null, true);
+    final args = HelicalCoilArgs.primary(
+      primaryCoil: null,
+      editing: true,
+    );
 
     final PrimaryCoil? primaryCoil = (await Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id, arguments: args)) as PrimaryCoil;
 
@@ -487,13 +487,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
 
     coilProvider.setPrimaryCoil(primaryCoil);
     Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
-  }
-
-  @override
-  void onItemTap(DialogAction action) {
-    if (action == DialogAction.onEdit) {
-      final coil = Provider.of<CoilProvider>(context).coil;
-    }
   }
 }
 

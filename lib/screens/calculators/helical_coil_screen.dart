@@ -1,6 +1,5 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/calculator/calculator.dart';
-import 'package:coiler_app/entities/HelicalCoil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
@@ -47,21 +46,12 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
   final formKey = GlobalKey<FormState>();
 
   void parseData() {
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
     var _diameter = double.tryParse(diameter);
     var _wireDiameter = double.tryParse(wireDiameter);
     var _wireSpacing = double.tryParse(wireSpacing);
-
-    if (_diameter == null || _wireDiameter == null || _wireSpacing == null) {
-      return;
-    }
-
-    /*if (!formKey.currentState!.validate()) {
-      return;
-    }*/
-/*
-    var _diameter = double.tryParse(diameter);
-    var _wireDiameter = double.tryParse(wireDiameter);
-    var _wireSpacing = double.tryParse(wireSpacing);*/
 
     if (_diameter != null && _wireDiameter != null && _wireSpacing != null) {
       _diameter = converter.convertUnits(_diameter, diameterUnit, Units.DEFAULT);
@@ -90,7 +80,7 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
     });
   }
 
-  void loadCoilInfo(HelicalCoil coil) {
+  void loadCoilInfo(dynamic coil) {
     var _inductance = converter.convertUnits(coil.inductance, Units.DEFAULT, inductanceUnit);
     var _wireSpacing = converter.convertUnits(coil.wireSpacing, Units.DEFAULT, wireSpacingUnit);
     var _coilDiameter = converter.convertUnits(coil.coilDiameter, Units.DEFAULT, diameterUnit);
@@ -170,9 +160,12 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
       editing = helicalCoilArgs.editing;
 
       if (editing) {
-        final _coil = helicalCoilArgs.coil;
-        if (_coil != null) {
-          loadCoilInfo(_coil);
+        final _primaryCoil = helicalCoilArgs.primaryCoil;
+        final _secondaryCoil = helicalCoilArgs.secondaryCoil;
+        if (_primaryCoil != null) {
+          loadCoilInfo(_primaryCoil);
+        } else if (_secondaryCoil != null) {
+          loadCoilInfo(_secondaryCoil);
         }
       }
     }
