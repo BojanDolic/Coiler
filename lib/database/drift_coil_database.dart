@@ -10,8 +10,7 @@ part 'drift_coil_database.g.dart';
 
 @DataClassName("TeslaCoil")
 class Teslacoils extends Table {
-  IntColumn get id =>
-      integer().nullable().autoIncrement().customConstraint("UNIQUE")();
+  IntColumn get id => integer().nullable().autoIncrement().customConstraint("UNIQUE")();
   TextColumn get type => text()();
   TextColumn get name => text()();
   TextColumn get description => text()();
@@ -22,10 +21,8 @@ class Teslacoils extends Table {
 @DataClassName("CoilForm")
 class Coils extends Table {
   IntColumn get id => integer().nullable().autoIncrement()();
-  IntColumn get primary_id => integer().nullable().customConstraint(
-      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
-  IntColumn get secondary_id => integer().nullable().customConstraint(
-      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get primary_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get secondary_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   IntColumn get type => integer()();
   RealColumn get inductance => real()();
   RealColumn get wireDiamter => real()();
@@ -35,8 +32,7 @@ class Coils extends Table {
 
 class CapacitorBank extends Table {
   IntColumn get id => integer().nullable().autoIncrement()();
-  IntColumn get coil_id => integer().nullable().customConstraint(
-      "NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get coil_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   RealColumn get capacitance => real()();
   IntColumn get voltage => integer()();
   IntColumn get seriesCapacitorCount => integer()();
@@ -58,20 +54,8 @@ class DriftCoilDatabase extends _$DriftCoilDatabase {
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration =>
-      MigrationStrategy(beforeOpen: (details) async {
-        /* print(
-            "FOREIGN KEYS ENABLED: ${customSelect('PRAGMA foreign_keys;').getSingle().}");*/
-
-        await customSelect('PRAGMA foreign_keys;')
-            .getSingle()
-            .then((value) => print(value.data));
-
+  MigrationStrategy get migration => MigrationStrategy(beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON;');
-
-        await customSelect('PRAGMA foreign_keys;')
-            .getSingle()
-            .then((value) => print(value.data));
       });
 }
 

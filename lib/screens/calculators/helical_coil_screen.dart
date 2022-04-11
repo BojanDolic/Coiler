@@ -1,5 +1,6 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/dialogs/DialogUtil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
@@ -152,7 +153,6 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
   @override
   void initState() {
     super.initState();
-    //print(widget.args);
 
     var helicalCoilArgs = widget.args;
 
@@ -174,6 +174,29 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 1,
+        centerTitle: true,
+        title: const Text(
+          "Helical coil",
+          style: boldTextStyleOpenSans15,
+        ),
+        actions: [
+          PopupMenuButton<String>(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            itemBuilder: (context) {
+              return popupCalculatorScreenInfo;
+            },
+            onSelected: (value) {
+              if (value == actionInformation) {
+                DialogUtil.openHelicalCoilInfoDialog(context);
+              }
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

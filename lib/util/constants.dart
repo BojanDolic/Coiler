@@ -72,5 +72,6 @@ enum DialogAction {
 const ACTION_DELETE = "delete";
 const ACTION_COPY_INFO = "copy";
 const ACTION_EDIT_INFO = "edit";
+const actionInformation = "info";
 
 const voltageUnitText = "V";
