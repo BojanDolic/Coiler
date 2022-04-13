@@ -1,6 +1,7 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
+import 'package:coiler_app/entities/HelicalCoil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
@@ -263,7 +264,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                         value: coilProvider.displayPrimaryInductance() ?? "Not added",
                                         componentAdded: coilProvider.hasPrimaryCoil(),
                                         componentType: coilProvider.getPrimaryCoilComponentType(),
-                                        onActionSelected: (action) {
+                                        onActionSelected: (action) async {
                                           if (action == DialogAction.onAdd) {
                                             if (coilProvider.hasPrimaryCoil()) {
                                               SnackbarUtil.showInfoSnackBar(
@@ -296,6 +297,16 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
 
                                             //TODO navigate to edit screen
 
+                                          } else if (action == DialogAction.onDelete) {
+                                            await Provider.of<DriftCoilDao>(context, listen: false)
+                                                .deletePrimary(coilProvider.coil)
+                                                .catchError((err) {
+                                              SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error while deleting primary!");
+                                              return;
+                                            });
+
+                                            coilProvider.removePrimaryCoil();
+                                            SnackbarUtil.showInfoSnackBar(context: context, text: "Primary coil deleted");
                                           }
                                         },
                                       ),
@@ -472,18 +483,26 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
   }
 
   void navigateToPrimaryCoilScreen() async {
-    final args = HelicalCoilArgs.primary(
-      primaryCoil: null,
-      editing: true,
-    );
+    final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+      context,
+      HelicalCoilCalculatorScreen.id,
+      arguments: HelicalCoilArgs(editing: true),
+    )) as HelicalCoil;
 
-    final PrimaryCoil? primaryCoil = (await Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id, arguments: args)) as PrimaryCoil;
-
-    if (primaryCoil == null) {
+    if (helicalCoil == null) {
       return;
     }
 
     final coilProvider = Provider.of<CoilProvider>(context, listen: false);
+
+    final primaryCoil = PrimaryCoil(
+      coilType: ComponentType.helicalCoil.index,
+      turns: helicalCoil.turns,
+      wireSpacing: helicalCoil.wireSpacing,
+      wireDiameter: helicalCoil.wireDiameter,
+      coilDiameter: helicalCoil.coilDiameter,
+      inductance: helicalCoil.inductance,
+    );
 
     coilProvider.setPrimaryCoil(primaryCoil);
     Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
@@ -851,7 +870,7 @@ void displayComponentActionDialog(BuildContext context, DialogCallbacks callback
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).backgroundColor,
-          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -899,6 +918,20 @@ void displayComponentActionDialog(BuildContext context, DialogCallbacks callback
                 onTap: () {
                   Navigator.pop(context);
                   callbacks.onItemTap(DialogAction.onInformation);
+                },
+              ),
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                leading: const Icon(
+                  Icons.delete,
+                  color: Colors.redAccent,
+                ),
+                title: const Text("Delete component"),
+                onTap: () {
+                  Navigator.pop(context);
+                  callbacks.onItemTap(DialogAction.onDelete);
                 },
               ),
             ],

@@ -40,8 +40,9 @@ class Converter {
     return result;
   }
 
-  double convertToMicro(dynamic value) =>
-      convertUnits(value, Units.DEFAULT, Units.MICRO);
+  double convertToMicro(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MICRO);
+
+  double convertToDefault(dynamic value, Units from) => convertUnits(value, from, Units.DEFAULT);
 
   static String getCoilType(CoilType coilType) {
     switch (coilType) {

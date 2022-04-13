@@ -11,6 +11,7 @@ class InputField extends StatelessWidget {
       this.hintText = "",
       this.labelText = "",
       this.maxLength,
+      this.errorText,
       required this.unitText,
       required this.inputFormatter})
       : super(key: key);
@@ -23,6 +24,7 @@ class InputField extends StatelessWidget {
   final String hintText;
   final String labelText;
   final String unitText;
+  final String? errorText;
   final int? maxLength;
 
   @override
@@ -71,6 +73,7 @@ class InputField extends StatelessWidget {
           ),
           hintText: hintText,
           labelText: labelText,
+          errorText: errorText,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(9),
           ),

@@ -67,6 +67,7 @@ enum DialogAction {
   onAdd,
   onEdit,
   onInformation,
+  onDelete,
 }
 
 const ACTION_DELETE = "delete";

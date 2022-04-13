@@ -2,6 +2,7 @@ import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/database/drift_coil_database.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
+import 'package:coiler_app/providers/HelicalCalculatorProvider.dart';
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
@@ -36,7 +37,7 @@ Future<void> main() async {
 
   await driver.start();
 
-  driftDb.driftCoilDao;
+  //driftDb.driftCoilDao;
 
   runApp(MultiProvider(
     providers: [
@@ -117,8 +118,11 @@ class MyApp extends StatelessWidget {
           final args = settings.arguments as HelicalCoilArgs?;
 
           return MaterialPageRoute(builder: (context) {
-            return HelicalCoilCalculatorScreen(
-              args: args,
+            return ChangeNotifierProvider<HelicalProvider>(
+              create: (context) => HelicalProvider(),
+              child: HelicalCoilCalculatorScreen(
+                args: args,
+              ),
             );
           });
         }

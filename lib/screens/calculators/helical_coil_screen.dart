@@ -1,16 +1,21 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/calculator/calculator.dart';
 import 'package:coiler_app/dialogs/DialogUtil.dart';
-import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/entities/HelicalCoil.dart';
+import 'package:coiler_app/providers/HelicalCalculatorProvider.dart';
+import 'package:coiler_app/util/SnackbarUtil.dart';
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/list_constants.dart';
+import 'package:coiler_app/util/ui_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/dropdown_widget.dart';
 import 'package:coiler_app/widgets/input_field.dart';
 import 'package:coiler_app/widgets/input_field_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class HelicalCoilCalculatorScreen extends StatefulWidget {
   const HelicalCoilCalculatorScreen({Key? key, this.args}) : super(key: key);
@@ -23,17 +28,6 @@ class HelicalCoilCalculatorScreen extends StatefulWidget {
 }
 
 class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScreen> {
-  Units inductanceUnit = Units.MICRO;
-  Units diameterUnit = Units.MILI;
-  Units wireDiameterUnit = Units.MILI;
-  Units wireSpacingUnit = Units.MILI;
-
-  String inductance = "";
-  String diameter = "";
-  String wireDiameter = "";
-  String wireSpacing = "";
-  int turns = 0;
-
   bool editing = false;
 
   final calculator = Calculator();
@@ -46,133 +40,59 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
 
   final formKey = GlobalKey<FormState>();
 
-  void parseData() {
-    if (!formKey.currentState!.validate()) {
-      return;
-    }
-    var _diameter = double.tryParse(diameter);
-    var _wireDiameter = double.tryParse(wireDiameter);
-    var _wireSpacing = double.tryParse(wireSpacing);
+  void loadCoilInfo(HelicalCoil coil) {
+    final _provider = Provider.of<HelicalProvider>(context, listen: false);
 
-    if (_diameter != null && _wireDiameter != null && _wireSpacing != null) {
-      _diameter = converter.convertUnits(_diameter, diameterUnit, Units.DEFAULT);
-      _wireDiameter = converter.convertUnits(_wireDiameter, wireDiameterUnit, Units.DEFAULT);
-      _wireSpacing = converter.convertUnits(_wireSpacing, wireSpacingUnit, Units.DEFAULT);
+    provider.editing = true;
 
-      calculateInductance(_diameter, _wireDiameter, _wireSpacing);
-    }
-  }
+    var _inductance = converter.convertUnits(coil.inductance, Units.DEFAULT, _provider.inductanceUnit);
+    var _turnSpacing = converter.convertUnits(coil.wireSpacing, Units.DEFAULT, _provider.turnSpacingUnit);
+    var _coilDiameter = converter.convertUnits(coil.coilDiameter, Units.DEFAULT, _provider.coilDiameterUnit);
+    var _wireDiameter = converter.convertUnits(coil.wireDiameter, Units.DEFAULT, _provider.wireDiameterUnit);
 
-  void convertValues(double diameter, double wireDiameter, double wireSpacing) {}
+    _provider.setTurns(coil.turns);
+    turnsController.text = _provider.turns.value.toString();
 
-  void calculateInductance(double diameter, double wireDiameter, double wireSpacing) {
-    var tempInductance = calculator.calculateSpiralCoilInductance(
-      turns,
-      diameter,
-      wireDiameter,
-      wireSpacing,
-      Units.DEFAULT,
-    );
+    _provider.setWireDiameter(_wireDiameter);
+    wireDiameterController.text = _provider.wireDiameter.value.toString();
 
-    var inductance = converter.convertUnits(tempInductance, Units.MICRO, inductanceUnit);
+    _provider.setCoilDiameter(_coilDiameter);
+    diameterController.text = _provider.coilDiameter.value.toString();
 
-    setState(() {
-      this.inductance = inductance.toStringAsFixed(7);
-    });
-  }
+    _provider.setTurnSpacing(_turnSpacing);
+    spacingController.text = _provider.turnSpacing.value.toString();
 
-  void loadCoilInfo(dynamic coil) {
-    var _inductance = converter.convertUnits(coil.inductance, Units.DEFAULT, inductanceUnit);
-    var _wireSpacing = converter.convertUnits(coil.wireSpacing, Units.DEFAULT, wireSpacingUnit);
-    var _coilDiameter = converter.convertUnits(coil.coilDiameter, Units.DEFAULT, diameterUnit);
-    var _wireDiameter = converter.convertUnits(coil.wireDiameter, Units.DEFAULT, wireDiameterUnit);
-
-    turnsController.text = coil.turns.toString();
-    turns = coil.turns;
-
-    diameterController.text = _coilDiameter.toString();
-    diameter = _coilDiameter.toString();
-
-    spacingController.text = _wireSpacing.toString();
-    wireSpacing = _wireSpacing.toString();
-
-    inductance = _inductance.toString();
-
-    wireDiameter = _wireDiameter.toString();
-    wireDiameterController.text = _wireDiameter.toString();
-  }
-
-  void saveCoil() {
-    var _inductance = double.tryParse(inductance);
-    var _diameter = double.tryParse(diameter);
-    var _wireDiameter = double.tryParse(wireDiameter);
-    var _wireSpacing = double.tryParse(wireSpacing);
-
-    if (validateInput() && formKey.currentState!.validate()) {
-      var inductanceTemp = converter.convertUnits(_inductance, inductanceUnit, Units.DEFAULT);
-      var wireSpacingTemp = converter.convertUnits(_wireSpacing, wireSpacingUnit, Units.DEFAULT);
-      var coilDiameterTemp = converter.convertUnits(_diameter, diameterUnit, Units.DEFAULT);
-      var wireDiameterTemp = converter.convertUnits(_wireDiameter, wireDiameterUnit, Units.DEFAULT);
-
-      final primaryCoil = PrimaryCoil(
-        coilType: ComponentType.helicalCoil.index,
-        turns: turns,
-        inductance: inductanceTemp,
-        wireSpacing: wireSpacingTemp,
-        coilDiameter: coilDiameterTemp,
-        wireDiameter: wireDiameterTemp,
-      );
-
-      Navigator.pop(context, primaryCoil);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Check your input fields !",
-            style: normalTextStyleOpenSans14.copyWith(
-              color: Colors.white,
-            ),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.red.shade800,
-          duration: const Duration(milliseconds: 1500),
-        ),
-      );
-    }
-  }
-
-  bool validateInput() {
-    var _inductance = double.tryParse(inductance);
-    var _diameter = double.tryParse(diameter);
-    var _wireDiameter = double.tryParse(wireDiameter);
-    var _wireSpacing = double.tryParse(wireSpacing);
-
-    return (_diameter != null && _wireDiameter != null && _wireSpacing != null && _inductance != null && turns != 0);
+    _provider.inductance = _inductance.toString();
   }
 
   @override
   void initState() {
     super.initState();
 
-    var helicalCoilArgs = widget.args;
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      var helicalCoilArgs = widget.args;
 
-    if (helicalCoilArgs != null) {
-      editing = helicalCoilArgs.editing;
+      if (helicalCoilArgs != null) {
+        editing = helicalCoilArgs.editing;
 
-      if (editing) {
-        final _primaryCoil = helicalCoilArgs.primaryCoil;
-        final _secondaryCoil = helicalCoilArgs.secondaryCoil;
-        if (_primaryCoil != null) {
-          loadCoilInfo(_primaryCoil);
-        } else if (_secondaryCoil != null) {
-          loadCoilInfo(_secondaryCoil);
+        provider.editing = true;
+
+        if (editing) {
+          final coil = helicalCoilArgs.coil;
+          if (coil != null) {
+            loadCoilInfo(coil);
+          }
         }
       }
-    }
+    });
   }
+
+  late HelicalProvider provider;
 
   @override
   Widget build(BuildContext context) {
+    provider = Provider.of<HelicalProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -203,7 +123,7 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
             padding: const EdgeInsets.all(9.0),
             child: Form(
               key: formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: AutovalidateMode.disabled,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -229,20 +149,18 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
                       children: [
                         Flexible(
                           child: Text(
-                            "Inductance: $inductance",
+                            "Inductance: ${provider.inductance}",
                             style: normalTextStyleOpenSans14,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         DropDownMenu<Units>(
-                          value: inductanceUnit,
+                          value: provider.inductanceUnit,
                           items: inductanceDropDownList,
                           onSelect: (newValue) {
-                            setState(() {
-                              inductanceUnit = newValue!;
-                              parseData();
-                            });
+                            provider.setInductanceUnit(newValue!);
+                            provider.calculateInductance();
                           },
                         ),
                       ],
@@ -257,24 +175,15 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
                     labelText: "Coil diameter",
                     inputFormatters: [decimalOnlyTextFormatter],
                     onTextChanged: (text) {
-                      setState(() {
-                        diameter = text;
-                        parseData();
-                      });
+                      provider.validateCoilDiameter(double.tryParse(text));
+                      provider.calculateInductance();
                     },
-                    validator: (text) {
-                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownValue: diameterUnit,
+                    errorText: provider.coilDiameter.error,
+                    validator: (text) => null,
+                    dropDownValue: provider.coilDiameterUnit,
                     onDropDownChanged: (value) {
-                      setState(() {
-                        diameterUnit = value!;
-                        parseData();
-                      });
+                      provider.setCoilDiameterUnit(value!);
+                      provider.calculateInductance();
                     },
                     dropDownList: lengthDropDownList,
                   ),
@@ -286,25 +195,17 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
                     hintText: "Enter wire diameter (W)",
                     labelText: "Wire diameter",
                     inputFormatters: [decimalOnlyTextFormatter],
+                    errorText: provider.wireDiameter.error,
                     onTextChanged: (text) {
-                      setState(() {
-                        wireDiameter = text;
-                        parseData();
-                      });
+                      print("WIRE DIAMETER TEXT $text");
+                      provider.validateWireDiameter(double.tryParse(text));
+                      provider.calculateInductance();
                     },
-                    validator: (text) {
-                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownValue: wireDiameterUnit,
+                    validator: (text) => null,
+                    dropDownValue: provider.wireDiameterUnit,
                     onDropDownChanged: (value) {
-                      setState(() {
-                        wireDiameterUnit = value!;
-                        parseData();
-                      });
+                      provider.setWireDiameterUnit(value!);
+                      provider.calculateInductance();
                     },
                     dropDownList: lengthDropDownList,
                   ),
@@ -316,25 +217,16 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
                     hintText: "Enter wire spacing (S)",
                     labelText: "Wire spacing",
                     inputFormatters: [decimalOnlyTextFormatter],
+                    errorText: provider.turnSpacing.error,
                     onTextChanged: (text) {
-                      setState(() {
-                        wireSpacing = text;
-                        parseData();
-                      });
+                      provider.validateTurnSpacing(double.tryParse(text));
+                      provider.calculateInductance();
                     },
-                    validator: (text) {
-                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownValue: wireSpacingUnit,
+                    validator: (text) => null,
+                    dropDownValue: provider.turnSpacingUnit,
                     onDropDownChanged: (value) {
-                      setState(() {
-                        wireSpacingUnit = value!;
-                        parseData();
-                      });
+                      provider.setTurnSpacingUnit(value!);
+                      provider.calculateInductance();
                     },
                     dropDownList: lengthDropDownList,
                   ),
@@ -349,26 +241,25 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
                     maxLength: 5,
                     inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                     onTextChanged: (text) {
-                      setState(() {
-                        turns = int.parse(text);
-                        parseData();
-                      });
+                      provider.validateTurns(int.tryParse(text));
+                      provider.calculateInductance();
                     },
-                    validator: (text) {
-                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
+                    errorText: provider.turns.error,
+                    validator: (text) => null,
                   ),
                   Visibility(
-                    visible: editing,
+                    visible: provider.editing,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                       ),
-                      child: TextButton(
+                      child: MaterialButton(
+                        elevation: 3,
+                        focusElevation: 0,
+                        highlightElevation: 0,
+                        splashColor: Colors.lightBlueAccent,
+                        color: ColorUtil.lightestBlue,
+                        shape: roundedBorder16,
                         onPressed: () {
                           saveCoil();
                         },
@@ -383,5 +274,14 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
         ),
       ),
     );
+  }
+
+  void saveCoil() {
+    if (!provider.validate) {
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Check your input fields!");
+    }
+
+    final coil = provider.saveCoil();
+    Navigator.pop(context, coil);
   }
 }
