@@ -1,3 +1,6 @@
+import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/conversion.dart';
+
 class PrimaryCoil {
   int? id;
   int coilType;
@@ -23,15 +26,14 @@ class PrimaryCoil {
     this.innerDiameter = 0.0,
   });
 
-  /* factory PrimaryCoil.fromDatabase(String databaseValue) {
-    var list = databaseValue.split(",");
-    return PrimaryCoil(
-      frequency: double.parse(list[0]),
-      turns: int.parse(list[1]),
-      inductance: double.parse(list[2]),
-      coilType: list[3],
-    );
-  }*/
+  @override
+  String toString() {
+    return "\n\nPRIMARY COIL INFO\n\n"
+        "Coil type: ${Converter.getCoilComponentType(ComponentType.values[coilType])}\n"
+        "Number of turns:$turns \n"
+        "Inductance: ${inductance} H\n"
+        "";
+  }
 
   String toDatabaseString() => "$frequency,$turns,$inductance,$coilType";
 }

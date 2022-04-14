@@ -3,6 +3,7 @@ import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/CoilInfo.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/coil_info_screen.dart';
+import 'package:coiler_app/util/SnackbarUtil.dart';
 import 'package:coiler_app/util/constants.dart' as Constants;
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/list_constants.dart';
@@ -31,8 +32,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
     var coilName = coilNameController.text;
 
     Coil coil = Coil();
-    coil.coilInfo =
-        CoilInfo(coilName: coilName, coilType: Converter.getCoilType(coilType));
+    coil.coilInfo = CoilInfo(coilName: coilName, coilType: Converter.getCoilType(coilType));
 
     Provider.of<DriftCoilDao>(context, listen: false).insertCoil(coil);
 
@@ -134,15 +134,11 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                     ),
                     child: ListTile(
                       onTap: () {
-                        Provider.of<CoilProvider>(context, listen: false).coil =
-                            coil;
-                        Navigator.pushNamed(context, CoilInfoScreen.id,
-                            arguments: coil);
+                        Provider.of<CoilProvider>(context, listen: false).coil = coil;
+                        Navigator.pushNamed(context, CoilInfoScreen.id, arguments: coil);
                       },
                       tileColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: Colors.grey.shade300)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade300)),
                       contentPadding: const EdgeInsets.all(9),
                       leading: Image.asset(
                         "assets/tcoil_icon.png",
@@ -186,28 +182,24 @@ class PopupMenu extends StatelessWidget {
         if (text == Constants.ACTION_DELETE) {
           Provider.of<DriftCoilDao>(context, listen: false).deleteCoil(coil);
         } else if (text == Constants.ACTION_COPY_INFO) {
-          Clipboard.setData(
-            ClipboardData(
-                text: "COIL INFORMATION\n\n"
-                    "Name: ${coil.coilInfo.coilName}\n"
-                //"Resonant frequency: ${coil.primary.frequency}",
-                ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Information copied to clipboard",
-                style: Constants.normalTextStyleOpenSans14
-                    .copyWith(color: Colors.white),
-              ),
-              duration: const Duration(milliseconds: 1500),
-            ),
-          );
+          copyCoilInfoToClipBoard(context);
         }
       },
       itemBuilder: (context) {
         return popupCoilButtonActions;
       },
     );
+  }
+
+  void copyCoilInfoToClipBoard(BuildContext context) {
+    Clipboard.setData(
+      ClipboardData(
+          text: "COIL INFORMATION\n\n"
+              "Name: ${coil.coilInfo.coilName}\n"
+              "Coil type: ${coil.coilInfo.coilType}\n"
+              "${coil.primaryCoil != null ? coil.primaryCoil.toString() : ""}\n"
+              "${coil.topload != null ? coil.topload.toString() : ""}\n"),
+    );
+    SnackbarUtil.showInfoSnackBar(context: context, text: "Coil information copied to clipboard.");
   }
 }
