@@ -11,6 +11,7 @@ class InputFieldDropDown extends StatelessWidget {
     this.inputType = const TextInputType.numberWithOptions(decimal: true),
     this.hintText = "",
     this.labelText = "",
+    this.errorText,
     required this.dropDownValue,
     required this.onDropDownChanged,
     required this.dropDownList,
@@ -25,6 +26,7 @@ class InputFieldDropDown extends StatelessWidget {
   final TextInputType inputType;
   final String hintText;
   final String labelText;
+  final String? errorText;
   final Units dropDownValue;
   final List<DropdownMenuItem<Units>> dropDownList;
 
@@ -57,8 +59,7 @@ class InputFieldDropDown extends StatelessWidget {
               child: DropdownButton<Units>(
                 borderRadius: BorderRadius.circular(9),
                 value: dropDownValue,
-                style:
-                    normalTextStyleOpenSans14.copyWith(color: Colors.black87),
+                style: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
                 underline: Container(),
                 items: dropDownList,
                 onChanged: (value) => onDropDownChanged(value),
@@ -69,6 +70,7 @@ class InputFieldDropDown extends StatelessWidget {
         ),
         hintText: hintText,
         labelText: labelText,
+        errorText: errorText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(9),
         ),

@@ -8,8 +8,7 @@ import 'package:drift/drift.dart';
 part 'DriftCoilDao.g.dart';
 
 @DriftAccessor(tables: [Coils, Teslacoils])
-class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase>
-    with _$DriftCoilDaoMixin {
+class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilDaoMixin {
   DriftCoilDao(DriftCoilDatabase attachedDatabase) : super(attachedDatabase);
 
   Stream<List<CoilForm>> getCoilsStream() {
@@ -32,6 +31,13 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase>
 
   Future deleteCoil(Coil coil) {
     return (delete(teslacoils)..where((tbl) => tbl.id.equals(coil.id))).go();
+  }
+
+  Future deletePrimary(Coil coil) {
+    if (coil.primaryCoil == null) {
+      return Future.value();
+    }
+    return (delete(coils)..where((tbl) => tbl.id.equals(coil.primaryCoil!.id))).go();
   }
 
   Future insertPrimary(Coil fullCoil) {
@@ -67,10 +73,8 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase>
 
     return select(teslacoils)
         .join([
-          leftOuterJoin(
-              primary_alias, primary_alias.primary_id.equalsExp(teslacoils.id)),
-          leftOuterJoin(secondary_alias,
-              secondary_alias.secondary_id.equalsExp(teslacoils.id))
+          leftOuterJoin(primary_alias, primary_alias.primary_id.equalsExp(teslacoils.id)),
+          leftOuterJoin(secondary_alias, secondary_alias.secondary_id.equalsExp(teslacoils.id))
         ])
         .watch()
         .map(

@@ -1,5 +1,7 @@
+import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
+import 'package:coiler_app/entities/HelicalCoil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
@@ -24,7 +26,7 @@ class CoilInfoScreen extends StatefulWidget {
   State<CoilInfoScreen> createState() => _CoilInfoScreenState();
 }
 
-class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallbacks {
+class _CoilInfoScreenState extends State<CoilInfoScreen> {
   final converter = Converter();
 
   bool isEditingInfo = false;
@@ -34,12 +36,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   late FocusNode _descriptionFocusNode;
 
   final scrollController = ScrollController();
-
-  /* final _componentActionDialogItems = [
-
-  ];*/
-
-  late DialogCallbacks dialogCallbacks;
 
   void updateInfo() async {
     var coilName = coilDescController.text;
@@ -56,7 +52,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
   void initState() {
     super.initState();
     _descriptionFocusNode = FocusNode();
-    dialogCallbacks = this;
   }
 
   @override
@@ -269,7 +264,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
                                         value: coilProvider.displayPrimaryInductance() ?? "Not added",
                                         componentAdded: coilProvider.hasPrimaryCoil(),
                                         componentType: coilProvider.getPrimaryCoilComponentType(),
-                                        onActionSelected: (action) {
+                                        onActionSelected: (action) async {
                                           if (action == DialogAction.onAdd) {
                                             if (coilProvider.hasPrimaryCoil()) {
                                               SnackbarUtil.showInfoSnackBar(
@@ -279,7 +274,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
                                               return;
                                             }
 
-                                            openCoilSelectDialog(context);
+                                            openCoilSelectDialog();
                                           }
 
                                           if (action == DialogAction.onInformation) {
@@ -302,6 +297,16 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
 
                                             //TODO navigate to edit screen
 
+                                          } else if (action == DialogAction.onDelete) {
+                                            await Provider.of<DriftCoilDao>(context, listen: false)
+                                                .deletePrimary(coilProvider.coil)
+                                                .catchError((err) {
+                                              SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error while deleting primary!");
+                                              return;
+                                            });
+
+                                            coilProvider.removePrimaryCoil();
+                                            SnackbarUtil.showInfoSnackBar(context: context, text: "Primary coil deleted");
                                           }
                                         },
                                       ),
@@ -425,11 +430,82 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> implements DialogCallba
     );
   }
 
-  @override
-  void onItemTap(DialogAction action) {
-    if (action == DialogAction.onEdit) {
-      final coil = Provider.of<CoilProvider>(context).coil;
+  void openCoilSelectDialog({bool coilFromChange = false}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Center(
+              child: Text(
+                "Select coil type",
+                style: normalTextStyleOpenSans14,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DialogCategoryWidget(
+                  text: 'Flat coil',
+                  imageAsset: 'assets/flat_coil_icon.png',
+                  color: Colors.orangeAccent,
+                  onTap: () {
+                    Navigator.pop(context);
+                    SnackbarUtil.showInfoSnackBar(context: context, text: "Currenty unavailable");
+                  },
+                ),
+                const SizedBox(
+                  height: 6,
+                ),
+                DialogCategoryWidget(
+                  text: 'Helical coil',
+                  imageAsset: 'assets/helical_coil_icon.png',
+                  color: Colors.orangeAccent,
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    if (coilFromChange) {
+                      if (Provider.of<CoilProvider>(context, listen: false).coil.primaryCoil?.coilType == ComponentType.helicalCoil.index) {
+                        //TODO return message that current coil type is the same as selected type
+                      } else {}
+                    }
+
+                    navigateToPrimaryCoilScreen();
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void navigateToPrimaryCoilScreen() async {
+    final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+      context,
+      HelicalCoilCalculatorScreen.id,
+      arguments: HelicalCoilArgs(editing: true),
+    )) as HelicalCoil;
+
+    if (helicalCoil == null) {
+      return;
     }
+
+    final coilProvider = Provider.of<CoilProvider>(context, listen: false);
+
+    final primaryCoil = PrimaryCoil(
+      coilType: ComponentType.helicalCoil.index,
+      turns: helicalCoil.turns,
+      wireSpacing: helicalCoil.wireSpacing,
+      wireDiameter: helicalCoil.wireDiameter,
+      coilDiameter: helicalCoil.coilDiameter,
+      inductance: helicalCoil.inductance,
+    );
+
+    coilProvider.setPrimaryCoil(primaryCoil);
+    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
   }
 }
 
@@ -794,7 +870,7 @@ void displayComponentActionDialog(BuildContext context, DialogCallbacks callback
       builder: (context) {
         return AlertDialog(
           backgroundColor: Theme.of(context).backgroundColor,
-          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -844,6 +920,20 @@ void displayComponentActionDialog(BuildContext context, DialogCallbacks callback
                   callbacks.onItemTap(DialogAction.onInformation);
                 },
               ),
+              ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                leading: const Icon(
+                  Icons.delete,
+                  color: Colors.redAccent,
+                ),
+                title: const Text("Delete component"),
+                onTap: () {
+                  Navigator.pop(context);
+                  callbacks.onItemTap(DialogAction.onDelete);
+                },
+              ),
             ],
           ),
         );
@@ -857,63 +947,6 @@ void openInformationDialog(BuildContext context) {
       return AlertDialog();
     },
   );
-}
-
-void openCoilSelectDialog(BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Center(
-            child: Text(
-              "Select coil type",
-              style: normalTextStyleOpenSans14,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DialogCategoryWidget(
-                text: 'Flat coil',
-                imageAsset: 'assets/flat_coil_icon.png',
-                color: Colors.orangeAccent,
-                onTap: () {
-                  Navigator.pop(context);
-                  SnackbarUtil.showInfoSnackBar(context: context, text: "Currenty unavailable");
-                },
-              ),
-              const SizedBox(
-                height: 6,
-              ),
-              DialogCategoryWidget(
-                text: 'Helical coil',
-                imageAsset: 'assets/helical_coil_icon.png',
-                color: Colors.orangeAccent,
-                onTap: () {
-                  Navigator.pop(context);
-                  navigateToPrimaryCoilScreen(context);
-                },
-              ),
-            ],
-          ),
-        );
-      });
-}
-
-void navigateToPrimaryCoilScreen(BuildContext context) async {
-  final PrimaryCoil? primaryCoil = await Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id) as PrimaryCoil;
-
-  if (primaryCoil == null) {
-    return;
-  }
-
-  final provider = Provider.of<CoilProvider>(context);
-
-  provider.setPrimaryCoil(primaryCoil);
 }
 
 class DialogCategoryWidget extends StatelessWidget {

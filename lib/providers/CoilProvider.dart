@@ -29,9 +29,10 @@ class CoilProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /*double calculateSecondaryHeightToWidthRatio() {
-    return _coil.primaryCoil?.
-  }*/
+  void removePrimaryCoil() {
+    _coil.primaryCoil = null;
+    notifyListeners();
+  }
 
   bool hasPrimaryCoil() => _coil.primaryCoil != null;
 
@@ -42,18 +43,14 @@ class CoilProvider extends ChangeNotifier {
     return (value > 0) ? value.toStringAsFixed(3) + " μH" : null;
   }
 
-  ComponentType getPrimaryCoilComponentType() =>
-      ComponentType.values[_coil.primaryCoil?.coilType ?? 1];
+  ComponentType getPrimaryCoilComponentType() => ComponentType.values[_coil.primaryCoil?.coilType ?? 1];
   bool hasCapacitorBank() => _coil.mmc != null;
 
   bool hasTopload() => _coil.topload != null;
 
   bool hasPrimaryComponents() {
-    return (isSolidStateCoil())
-        ? (_coil.primaryCoil != null)
-        : (_coil.primaryCoil != null && _coil.mmc != null);
+    return (isSolidStateCoil()) ? (_coil.primaryCoil != null) : (_coil.primaryCoil != null && _coil.mmc != null);
   }
 
-  bool isSolidStateCoil() =>
-      _coil.coilInfo.coilType == Converter.getCoilType(CoilType.SSTC);
+  bool isSolidStateCoil() => _coil.coilInfo.coilType == Converter.getCoilType(CoilType.SSTC);
 }

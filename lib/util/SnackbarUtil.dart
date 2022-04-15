@@ -1,3 +1,4 @@
+import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
 
 class SnackbarUtil {
@@ -34,6 +35,25 @@ class SnackbarUtil {
         ),
         duration: const Duration(seconds: 2),
         action: SnackBarAction(label: buttonText, onPressed: onButtonPressed),
+      ),
+    );
+  }
+
+  static void showErrorSnackBar({
+    required BuildContext context,
+    required String errorText,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        //#c94242
+        backgroundColor: const Color(0xFFc94242),
+        elevation: 6,
+        behavior: SnackBarBehavior.floating,
+        content: Text(
+          errorText,
+          style: normalTextStyleOpenSans14.copyWith(color: Colors.white),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

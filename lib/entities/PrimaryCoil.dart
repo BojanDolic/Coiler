@@ -1,4 +1,6 @@
-class PrimaryCoil {
+import 'package:coiler_app/entities/HelicalCoil.dart';
+
+class PrimaryCoil extends HelicalCoil {
   int? id;
   int coilType;
   int turns;
@@ -23,15 +25,16 @@ class PrimaryCoil {
     this.innerDiameter = 0.0,
   });
 
-  /* factory PrimaryCoil.fromDatabase(String databaseValue) {
-    var list = databaseValue.split(",");
-    return PrimaryCoil(
-      frequency: double.parse(list[0]),
-      turns: int.parse(list[1]),
-      inductance: double.parse(list[2]),
-      coilType: list[3],
-    );
-  }*/
+  @override
+  bool operator ==(Object other) {
+    return (other is PrimaryCoil &&
+        other.inductance == inductance &&
+        other.coilDiameter == coilDiameter &&
+        other.turns == turns &&
+        other.wireSpacing == wireSpacing &&
+        other.wireDiameter == wireDiameter &&
+        other.innerDiameter == innerDiameter);
+  }
 
   String toDatabaseString() => "$frequency,$turns,$inductance,$coilType";
 }
