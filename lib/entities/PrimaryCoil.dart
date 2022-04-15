@@ -1,7 +1,9 @@
+
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/entities/HelicalCoil.dart';
 
-class PrimaryCoil {
+class PrimaryCoil extends HelicalCoil {
   int? id;
   int coilType;
   int turns;
@@ -33,6 +35,16 @@ class PrimaryCoil {
         "Number of turns:$turns \n"
         "Inductance: $inductance H\n"
         "==                   ==";
+  }
+  
+  bool operator ==(Object other) {
+    return (other is PrimaryCoil &&
+        other.inductance == inductance &&
+        other.coilDiameter == coilDiameter &&
+        other.turns == turns &&
+        other.wireSpacing == wireSpacing &&
+        other.wireDiameter == wireDiameter &&
+        other.innerDiameter == innerDiameter);
   }
 
   String toDatabaseString() => "$frequency,$turns,$inductance,$coilType";

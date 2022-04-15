@@ -102,6 +102,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/formulas/
 
   fonts:
     - family: OpenSans

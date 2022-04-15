@@ -13,15 +13,5 @@ class SecondaryCoil {
     this.wireSpacing = 0.0,
   });
 
-  factory SecondaryCoil.fromDatabase(String databaseValue) {
-    var list = databaseValue.split(",");
-    return SecondaryCoil(
-      inductance: double.parse(list[0]),
-      wireDiameter: double.parse(list[1]),
-      wireSpacing: double.parse(list[2]),
-      turns: int.parse(list[3]),
-    );
-  }
-
   String toDatabaseString() => "$inductance,$wireDiameter,$wireSpacing,$turns";
 }

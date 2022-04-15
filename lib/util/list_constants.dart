@@ -166,3 +166,19 @@ final popupCoilInfoScreenActions = [
     ),
   ),
 ];
+
+final popupCalculatorScreenInfo = [
+  PopupMenuItem(
+    value: Constants.actionInformation,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: const [
+        Text("Information"),
+        Icon(
+          Icons.info_outline_rounded,
+          color: Colors.blue,
+        ),
+      ],
+    ),
+  ),
+];
