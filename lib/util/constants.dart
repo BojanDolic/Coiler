@@ -33,6 +33,13 @@ const boldTextStyleOpenSans15 = TextStyle(
   color: Colors.black87,
 );
 
+const mediumHeadlineTextStyle = TextStyle(
+  fontFamily: "OpenSans",
+  fontWeight: FontWeight.bold,
+  fontSize: 17,
+  color: Colors.black87,
+);
+
 const biggerTextStyleOpenSans15 = TextStyle(
   fontFamily: "OpenSans",
   fontWeight: FontWeight.w500,
@@ -40,6 +47,7 @@ const biggerTextStyleOpenSans15 = TextStyle(
 );
 
 const lightThemeBackgroundColor = Color(0xFFf9fcff);
+const darkThemeBackgroundColor = Color(0xFF1a1a1a);
 
 final decimalOnlyTextFormatter = FilteringTextInputFormatter.allow(
   RegExp("(^(\\d*)((\\.{1})(\\d*))?)"),

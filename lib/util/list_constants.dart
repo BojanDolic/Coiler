@@ -88,7 +88,40 @@ const coilTypeDropDownList = [
   ),
 ];
 
-final popupCoilButtonActions = [
+List<PopupMenuItem> popupCoilButtonActions(BuildContext context) {
+  return [
+    PopupMenuItem(
+      value: Constants.ACTION_COPY_INFO,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("Copy information"),
+          Icon(
+            Icons.copy,
+            color: Theme.of(context).iconTheme.color,
+          ),
+        ],
+      ),
+    ),
+    PopupMenuItem(
+      value: Constants.ACTION_DELETE,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: const [
+          Text(
+            "Delete",
+          ),
+          Icon(
+            Icons.highlight_remove_outlined,
+            color: Colors.red,
+          ),
+        ],
+      ),
+    ),
+  ];
+}
+
+/*final popupCoilButtonActions = [
   PopupMenuItem(
     value: Constants.ACTION_COPY_INFO,
     child: Row(
@@ -108,7 +141,6 @@ final popupCoilButtonActions = [
       children: const [
         Text(
           "Delete",
-          style: Constants.normalTextStyleOpenSans14,
         ),
         Icon(
           Icons.highlight_remove_outlined,
@@ -117,7 +149,7 @@ final popupCoilButtonActions = [
       ],
     ),
   ),
-];
+];*/
 
 final popupCoilInfoScreenActions = [
   PopupMenuItem(

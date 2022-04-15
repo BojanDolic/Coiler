@@ -91,6 +91,7 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
   Widget build(BuildContext context) {
     final coilDaoProvider = Provider.of<DriftCoilDao>(context);
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       floatingActionButton: FloatingActionButton.extended(
         isExtended: true,
         label: const Text("New coil"),
@@ -137,8 +138,8 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                         Provider.of<CoilProvider>(context, listen: false).coil = coil;
                         Navigator.pushNamed(context, CoilInfoScreen.id, arguments: coil);
                       },
-                      tileColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade300)),
+                      tileColor: Theme.of(context).listTileTheme.tileColor,
+                      shape: Theme.of(context).listTileTheme.shape,
                       contentPadding: const EdgeInsets.all(9),
                       leading: Image.asset(
                         "assets/tcoil_icon.png",
@@ -147,11 +148,11 @@ class _CoilsListScreenState extends State<CoilsListScreen> {
                       ),
                       title: Text(
                         coil.coilInfo.coilName,
-                        style: Constants.boldCategoryTextStyle,
+                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       subtitle: Text(
                         coil.coilInfo.coilDesc,
-                        style: Constants.lightCategoryTextStyle,
+                        style: Theme.of(context).textTheme.displaySmall,
                       ),
                       trailing: PopupMenu(coil: coil),
                     ),
@@ -174,7 +175,13 @@ class PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return PopupMenuButton(
+      icon: Icon(
+        Icons.adaptive.more,
+        color: theme.iconTheme.color,
+      ),
+      color: theme.popupMenuTheme.color,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -186,7 +193,7 @@ class PopupMenu extends StatelessWidget {
         }
       },
       itemBuilder: (context) {
-        return popupCoilButtonActions;
+        return popupCoilButtonActions(context);
       },
     );
   }
@@ -194,11 +201,12 @@ class PopupMenu extends StatelessWidget {
   void copyCoilInfoToClipBoard(BuildContext context) {
     Clipboard.setData(
       ClipboardData(
-          text: "COIL INFORMATION\n\n"
-              "Name: ${coil.coilInfo.coilName}\n"
-              "Coil type: ${coil.coilInfo.coilType}\n"
-              "${coil.primaryCoil != null ? coil.primaryCoil.toString() : ""}\n"
-              "${coil.topload != null ? coil.topload.toString() : ""}\n"),
+        text: "COIL INFORMATION\n\n"
+            "Name: ${coil.coilInfo.coilName}\n"
+            "Coil type: ${coil.coilInfo.coilType}\n"
+            "${coil.primaryCoil != null ? coil.primaryCoil.toString() : ""}\n"
+            "${coil.topload != null ? coil.topload.toString() : ""}\n",
+      ),
     );
     SnackbarUtil.showInfoSnackBar(context: context, text: "Coil information copied to clipboard.");
   }
