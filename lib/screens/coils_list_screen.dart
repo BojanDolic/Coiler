@@ -201,11 +201,7 @@ class PopupMenu extends StatelessWidget {
   void copyCoilInfoToClipBoard(BuildContext context) {
     Clipboard.setData(
       ClipboardData(
-        text: "COIL INFORMATION\n\n"
-            "Name: ${coil.coilInfo.coilName}\n"
-            "Coil type: ${coil.coilInfo.coilType}\n"
-            "${coil.primaryCoil != null ? coil.primaryCoil.toString() : ""}\n"
-            "${coil.topload != null ? coil.topload.toString() : ""}\n",
+        text: coil.toString(),
       ),
     );
     SnackbarUtil.showInfoSnackBar(context: context, text: "Coil information copied to clipboard.");

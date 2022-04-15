@@ -28,11 +28,11 @@ class PrimaryCoil {
 
   @override
   String toString() {
-    return "\n\nPRIMARY COIL INFO\n\n"
+    return "== PRIMARY COIL INFO ==\n"
         "Coil type: ${Converter.getCoilComponentType(ComponentType.values[coilType])}\n"
         "Number of turns:$turns \n"
-        "Inductance: ${inductance} H\n"
-        "";
+        "Inductance: $inductance H\n"
+        "==                   ==";
   }
 
   String toDatabaseString() => "$frequency,$turns,$inductance,$coilType";
