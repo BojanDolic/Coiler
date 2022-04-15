@@ -12,6 +12,12 @@ class Coil {
   CapacitorBank? mmc;
   Topload? topload;
 
-  Coil({this.id, this.primaryCoil, this.secondaryCoil, this.mmc, this.topload})
-      : coilInfo = CoilInfo();
+  Coil({this.id, this.primaryCoil, this.secondaryCoil, this.mmc, this.topload}) : coilInfo = CoilInfo();
+
+  @override
+  String toString() {
+    return 'COIL SPECIFICATIONS\n\n'
+        '${coilInfo.toString()}\n\n'
+        '${primaryCoil.toString()}';
+  }
 }

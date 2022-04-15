@@ -1,3 +1,6 @@
+
+import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/entities/HelicalCoil.dart';
 
 class PrimaryCoil extends HelicalCoil {
@@ -26,6 +29,14 @@ class PrimaryCoil extends HelicalCoil {
   });
 
   @override
+  String toString() {
+    return "== PRIMARY COIL INFO ==\n"
+        "Coil type: ${Converter.getCoilComponentType(ComponentType.values[coilType])}\n"
+        "Number of turns:$turns \n"
+        "Inductance: $inductance H\n"
+        "==                   ==";
+  }
+  
   bool operator ==(Object other) {
     return (other is PrimaryCoil &&
         other.inductance == inductance &&

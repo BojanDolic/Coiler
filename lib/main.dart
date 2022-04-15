@@ -74,10 +74,29 @@ class MyApp extends StatelessWidget {
           ),
         ),
         backgroundColor: lightThemeBackgroundColor,
+        listTileTheme: ListTileThemeData(
+          tileColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Colors.grey.shade400),
+          ),
+        ),
+        textTheme: TextTheme(
+          headlineMedium: mediumHeadlineTextStyle,
+          displaySmall: lightCategoryTextStyle.copyWith(
+            color: Colors.black54,
+            fontSize: 14,
+          ),
+        ),
         snackBarTheme: const SnackBarThemeData(
           backgroundColor: Color(0xFF2e2e2e),
           contentTextStyle: normalSnackbarTextStyleOpenSans14,
         ),
+        iconTheme: const IconThemeData(
+          color: Colors.black87,
+        ),
+        popupMenuTheme: const PopupMenuThemeData(
+          color: Colors.white,
         dialogTheme: const DialogTheme(
           backgroundColor: lightThemeBackgroundColor,
           contentTextStyle: normalTextStyleOpenSans14,
@@ -91,7 +110,33 @@ class MyApp extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.grey.shade900,
+        popupMenuTheme: PopupMenuThemeData(
+          color: darkThemeBackgroundColor,
+          textStyle: normalTextStyleOpenSans14.copyWith(
+            color: Colors.white,
+          ),
+        ),
+        primaryIconTheme: IconThemeData(
+          color: Colors.white,
+        ),
+        iconTheme: const IconThemeData(
+          color: Colors.white70,
+        ),
+        textTheme: TextTheme(
+          headlineMedium: mediumHeadlineTextStyle.copyWith(color: Colors.white),
+          displaySmall: lightCategoryTextStyle.copyWith(
+            color: Colors.white54,
+            fontSize: 14,
+          ),
+        ),
+        listTileTheme: ListTileThemeData(
+          tileColor: Colors.grey.shade900,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Colors.white12),
+          ),
+        ),
+        backgroundColor: darkThemeBackgroundColor,
         dialogTheme: DialogTheme(
           backgroundColor: const Color(0xFF2e2e2e),
           contentTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white),
