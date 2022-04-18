@@ -44,6 +44,8 @@ class Converter {
 
   double convertToDefault(dynamic value, Units from) => convertUnits(value, from, Units.DEFAULT);
 
+  double convertFromDefaultToMili(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MILI);
+
   static String getCoilType(CoilType coilType) {
     switch (coilType) {
       case CoilType.SPARK_GAP:
