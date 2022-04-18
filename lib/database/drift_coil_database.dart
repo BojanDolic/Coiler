@@ -24,10 +24,12 @@ class Coils extends Table {
   IntColumn get primary_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   IntColumn get secondary_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   IntColumn get type => integer()();
+  IntColumn get turns => integer()();
   RealColumn get inductance => real()();
-  RealColumn get wireDiamter => real()();
+  RealColumn get wireDiameter => real()();
   RealColumn get wireSpacing => real()();
   RealColumn get coilDiameter => real()();
+  RealColumn get innerDiameter => real()();
 }
 
 class CapacitorBank extends Table {

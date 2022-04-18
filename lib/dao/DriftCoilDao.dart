@@ -2,7 +2,6 @@ import 'package:coiler_app/database/drift_coil_database.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/CoilInfo.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
-import 'package:coiler_app/util/constants.dart';
 import 'package:drift/drift.dart';
 
 part 'DriftCoilDao.g.dart';
@@ -16,17 +15,15 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
   }
 
   Future<void> insertCoil(Coil coil) async {
-    transaction(() async {
-      var coilId = await into(teslacoils).insert(
-        TeslaCoil(
-          type: coil.coilInfo.coilType,
-          name: coil.coilInfo.coilName,
-          description: "",
-          primaryFrequency: 0.0,
-          secondaryFrequency: 0.0,
-        ),
-      );
-    });
+    into(teslacoils).insert(
+      TeslaCoil(
+        type: coil.coilInfo.coilType,
+        name: coil.coilInfo.coilName,
+        description: "",
+        primaryFrequency: 0.0,
+        secondaryFrequency: 0.0,
+      ),
+    );
   }
 
   Future deleteCoil(Coil coil) {
@@ -46,10 +43,12 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
           primary_id: fullCoil.id,
           secondary_id: null,
           type: fullCoil.primaryCoil?.coilType ?? -1,
+          turns: fullCoil.primaryCoil?.turns ?? 0,
           inductance: fullCoil.primaryCoil?.inductance ?? 0.0,
-          wireDiamter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
+          wireDiameter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
           wireSpacing: fullCoil.primaryCoil?.wireSpacing ?? 0.0,
           coilDiameter: fullCoil.primaryCoil?.coilDiameter ?? 0.0,
+          innerDiameter: fullCoil.primaryCoil?.innerDiameter ?? 0.0,
         ),
         mode: InsertMode.insertOrIgnore));
     //onConflict: DoUpdate((old) => );
@@ -104,14 +103,12 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
                   id: primary.id,
                   coilType: primary.type,
                   inductance: primary.inductance,
+                  turns: primary.turns,
+                  wireDiameter: primary.wireDiameter,
+                  wireSpacing: primary.wireSpacing,
+                  coilDiameter: primary.coilDiameter,
+                  innerDiameter: primary.innerDiameter,
                 );
-
-                print("COMPONENT TYPES");
-                print(ComponentType.helicalCoil);
-                print(ComponentType.flatCoil);
-                print(ComponentType.fullToroidTopload);
-
-                print(ComponentType.values[3]);
 
                 fullCoil.primaryCoil = _primaryCoil;
               }
