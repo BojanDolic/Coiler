@@ -97,6 +97,7 @@ class MyApp extends StatelessWidget {
         ),
         popupMenuTheme: const PopupMenuThemeData(
           color: Colors.white,
+        ),
         dialogTheme: const DialogTheme(
           backgroundColor: lightThemeBackgroundColor,
           contentTextStyle: normalTextStyleOpenSans14,
