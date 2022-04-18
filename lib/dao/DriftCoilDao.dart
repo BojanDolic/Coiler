@@ -46,10 +46,12 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
           primary_id: fullCoil.id,
           secondary_id: null,
           type: fullCoil.primaryCoil?.coilType ?? -1,
+          turns: fullCoil.primaryCoil?.turns ?? 0,
           inductance: fullCoil.primaryCoil?.inductance ?? 0.0,
-          wireDiamter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
+          wireDiameter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
           wireSpacing: fullCoil.primaryCoil?.wireSpacing ?? 0.0,
           coilDiameter: fullCoil.primaryCoil?.coilDiameter ?? 0.0,
+          innerDiameter: fullCoil.primaryCoil?.innerDiameter ?? 0.0,
         ),
         mode: InsertMode.insertOrIgnore));
     //onConflict: DoUpdate((old) => );
