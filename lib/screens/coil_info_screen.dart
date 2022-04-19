@@ -206,33 +206,31 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                 ),
                                 Visibility(
                                   visible: !coilProvider.isSolidStateCoil(),
-                                  child: BorderContainer(
-                                    child: ListTile(
-                                      leading: Image.asset(
-                                        "assets/resfreq_icon.png",
-                                        color: Colors.lightBlue,
-                                        width: 42,
-                                        height: 42,
-                                      ),
-                                      title: const Text("Primary frequency"),
-                                      subtitle: Text(
-                                        "Primary res freq",
-                                        maxLines: 2,
-                                      ),
-                                      trailing: IconButton(
-                                        onPressed: () async {},
-                                        icon: const Icon(Icons.edit),
-                                        //TODO add icon for calculating
-                                        /*icon: hasSecondaryComponents(coil)
-                                                    ? const Icon(
-                                                        Icons.calculate_outlined,
-                                                        color: Colors.lightBlue,
-                                                      )
-                                                    : const Icon(Icons.edit),*/
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                      ),
+                                  child: ListTile(
+                                    leading: Image.asset(
+                                      "assets/resfreq_icon.png",
+                                      color: Colors.lightBlue,
+                                      width: 42,
+                                      height: 42,
+                                    ),
+                                    title: const Text("Primary frequency"),
+                                    subtitle: Text(
+                                      "Primary res freq",
+                                      maxLines: 2,
+                                    ),
+                                    trailing: IconButton(
+                                      onPressed: () async {},
+                                      icon: const Icon(Icons.edit),
+                                      //TODO add icon for calculating
+                                      /*icon: hasSecondaryComponents(coil)
+                                                  ? const Icon(
+                                                      Icons.calculate_outlined,
+                                                      color: Colors.lightBlue,
+                                                    )
+                                                  : const Icon(Icons.edit),*/
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
                                     ),
                                   ),
                                 ),
@@ -355,33 +353,31 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                 const SizedBox(
                                   height: 12,
                                 ),
-                                BorderContainer(
-                                  child: ListTile(
-                                    leading: Image.asset(
-                                      "assets/resfreq_icon.png",
-                                      color: Colors.lightBlue,
-                                      width: 42,
-                                      height: 42,
-                                    ),
-                                    title: const Text("Secondary frequency"),
-                                    subtitle: Text(
-                                      "Missing components!",
-                                      maxLines: 2,
-                                    ),
-                                    trailing: IconButton(
-                                      onPressed: () async {},
-                                      icon: const Icon(Icons.edit),
-                                      //TODO add icon for calculating
-                                      /*icon: hasSecondaryComponents(coil)
-                                                  ? const Icon(
-                                                      Icons.calculate_outlined,
-                                                      color: Colors.lightBlue,
-                                                    )
-                                                  : const Icon(Icons.edit),*/
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                    ),
+                                ListTile(
+                                  leading: Image.asset(
+                                    "assets/resfreq_icon.png",
+                                    color: Colors.lightBlue,
+                                    width: 42,
+                                    height: 42,
+                                  ),
+                                  title: const Text("Secondary frequency"),
+                                  subtitle: Text(
+                                    "Missing components!",
+                                    maxLines: 2,
+                                  ),
+                                  trailing: IconButton(
+                                    onPressed: () async {},
+                                    icon: const Icon(Icons.edit),
+                                    //TODO add icon for calculating
+                                    /*icon: hasSecondaryComponents(coil)
+                                                ? const Icon(
+                                                    Icons.calculate_outlined,
+                                                    color: Colors.lightBlue,
+                                                  )
+                                                : const Icon(Icons.edit),*/
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
                                   ),
                                 ),
                                 const SizedBox(
@@ -1034,9 +1030,6 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
         if (isPrimary) {
           final helicalCoil = coil.primaryCoil!;
 
-          final coilHeight = Converter().convertFromDefaultToMili(helicalCoil.getCoilHeight());
-          final coilWidth = Converter().convertFromDefaultToMili(helicalCoil.coilDiameter);
-
           components = [
             ComponentData(
               name: "Inductance",
@@ -1058,14 +1051,12 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
               value: helicalCoil.turns.toString(),
               imageAssetPath: "assets/icons/quantity_icon.png",
             ),
-            ComponentData(
-              name: "H/W ratio",
-              value: Util.getHeightToWidthRatio(coilHeight, coilWidth).toStringAsFixed(1),
-              imageAssetPath: "assets/icons/quantity_icon.png",
-            ),
           ];
         } else {
-          final helicalCoil = coil.secondaryCoil;
+          final helicalCoil = coil.secondaryCoil!;
+
+          final coilHeight = Converter().convertFromDefaultToMili(helicalCoil.getCoilHeight());
+          final coilWidth = Converter().convertFromDefaultToMili(helicalCoil.coilDiameter);
 
           components = [
             ComponentData(
@@ -1081,6 +1072,11 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
             ComponentData(
               name: "Turns",
               value: coil.primaryCoil?.turns.toString() ?? "No data",
+              imageAssetPath: "assets/icons/quantity_icon.png",
+            ),
+            ComponentData(
+              name: "H/W ratio",
+              value: Util.getHeightToWidthRatio(coilHeight, coilWidth).toStringAsFixed(1),
               imageAssetPath: "assets/icons/quantity_icon.png",
             ),
           ];

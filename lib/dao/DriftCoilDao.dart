@@ -79,7 +79,7 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
         .map(
           (rows) {
             if (rows.isNotEmpty) {
-              print(rows.first.rawData.data);
+              //print(rows.first.rawData.data);
             }
             return rows.map((e) {
               var fullCoil = Coil();
