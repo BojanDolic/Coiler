@@ -43,6 +43,11 @@ class CoilProvider extends ChangeNotifier {
     return (value > 0) ? value.toStringAsFixed(3) + " μH" : null;
   }
 
+  String? displayPrimaryCapacitance() {
+    final capacitance = Converter().convertUnits(_coil.mmc?.capacitance, Units.DEFAULT, Units.NANO);
+    return (capacitance > 0) ? capacitance.toStringAsFixed(3) + " nF" : null;
+  }
+
   ComponentType getPrimaryCoilComponentType() => ComponentType.values[_coil.primaryCoil?.coilType ?? 1];
   bool hasCapacitorBank() => _coil.mmc != null;
 

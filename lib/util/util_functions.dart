@@ -24,6 +24,10 @@ class Util {
     return (coil.primaryCoil != null);
   }
 
+  static double getHeightToWidthRatio(double height, double width) {
+    return height / width;
+  }
+
   /*static bool hasSecondary(FullCoil coil) {
     return coil
   }*/
