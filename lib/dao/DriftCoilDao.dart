@@ -6,7 +6,7 @@ import 'package:drift/drift.dart';
 
 part 'DriftCoilDao.g.dart';
 
-@DriftAccessor(tables: [Coils, Teslacoils])
+@DriftAccessor(tables: [Coils, Teslacoils, CapacitorBank, Toploads])
 class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilDaoMixin {
   DriftCoilDao(DriftCoilDatabase attachedDatabase) : super(attachedDatabase);
 
@@ -52,6 +52,24 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
         ),
         mode: InsertMode.insertOrIgnore));
     //onConflict: DoUpdate((old) => );
+  }
+
+  Future insertTopload(Coil coil) {
+    final topload = coil.topload;
+
+    if (topload == null) {
+      return Future.value();
+    }
+
+    return (into(toploads).insert(
+      CoilTopload(
+        type: topload.type,
+        capacitance: topload.capacitance,
+        sphereDiameter: topload.sphereDiameter,
+        toroidMajorDiameter: topload.toroidMajorDiameter,
+        toroidMinorDiameter: topload.toroidMinorDiameter,
+      ),
+    ));
   }
 
   Future updateCoilInfo(Coil coil) {
