@@ -12,6 +12,7 @@ import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/screens/main_screen.dart';
 import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/ui_constants.dart';
 import 'package:drift/native.dart';
 import 'package:drift_local_storage_inspector/drift_local_storage_inspector.dart';
 import 'package:flutter/cupertino.dart';
@@ -98,9 +99,10 @@ class MyApp extends StatelessWidget {
         popupMenuTheme: const PopupMenuThemeData(
           color: Colors.white,
         ),
-        dialogTheme: const DialogTheme(
+        dialogTheme: DialogTheme(
           backgroundColor: lightThemeBackgroundColor,
           contentTextStyle: normalTextStyleOpenSans14,
+          shape: roundedBorder16,
         ),
       ),
       darkTheme: ThemeData(
@@ -131,7 +133,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         listTileTheme: ListTileThemeData(
+          textColor: Colors.white,
           tileColor: Colors.grey.shade900,
+          iconColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: const BorderSide(color: Colors.white12),
@@ -139,8 +143,9 @@ class MyApp extends StatelessWidget {
         ),
         backgroundColor: darkThemeBackgroundColor,
         dialogTheme: DialogTheme(
-          backgroundColor: const Color(0xFF2e2e2e),
+          backgroundColor: darkThemeBackgroundColor,
           contentTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white),
+          shape: roundedBorder16,
         ),
       ),
       routes: {

@@ -13,5 +13,9 @@ class SecondaryCoil {
     this.wireSpacing = 0.0,
   });
 
+  double getCoilHeight() {
+    return turns * (wireSpacing + wireDiameter);
+  }
+
   String toDatabaseString() => "$inductance,$wireDiameter,$wireSpacing,$turns";
 }

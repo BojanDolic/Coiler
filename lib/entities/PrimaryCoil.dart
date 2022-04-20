@@ -41,6 +41,10 @@ class PrimaryCoil extends HelicalCoil {
         "${innerDiameter != 0 ? "\n${converter.convertFromDefaultToMili(innerDiameter)}mm" : ""}";
   }
 
+  double getCoilHeight() {
+    return turns * (wireSpacing + wireDiameter);
+  }
+
   bool operator ==(Object other) {
     return (other is PrimaryCoil &&
         other.inductance == inductance &&
