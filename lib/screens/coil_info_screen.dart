@@ -10,6 +10,7 @@ import 'package:coiler_app/util/DialogCallback.dart';
 import 'package:coiler_app/util/SnackbarUtil.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/extension_functions.dart';
 import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/util/util_functions.dart';
 import 'package:coiler_app/widgets/border_container.dart';
@@ -215,22 +216,16 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                     ),
                                     title: const Text("Primary frequency"),
                                     subtitle: Text(
-                                      "Primary res freq",
-                                      maxLines: 2,
+                                      coilProvider.displayPrimaryResonantFrequency() ?? "Missing primary components",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     trailing: IconButton(
                                       onPressed: () async {},
                                       icon: const Icon(Icons.edit),
-                                      //TODO add icon for calculating
-                                      /*icon: hasSecondaryComponents(coil)
-                                                  ? const Icon(
-                                                      Icons.calculate_outlined,
-                                                      color: Colors.lightBlue,
-                                                    )
-                                                  : const Icon(Icons.edit),*/
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
+                                      horizontal: 12,
                                     ),
                                   ),
                                 ),
@@ -361,20 +356,13 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                     height: 42,
                                   ),
                                   title: const Text("Secondary frequency"),
-                                  subtitle: Text(
+                                  subtitle: const Text(
                                     "Missing components!",
                                     maxLines: 2,
                                   ),
                                   trailing: IconButton(
                                     onPressed: () async {},
                                     icon: const Icon(Icons.edit),
-                                    //TODO add icon for calculating
-                                    /*icon: hasSecondaryComponents(coil)
-                                                ? const Icon(
-                                                    Icons.calculate_outlined,
-                                                    color: Colors.lightBlue,
-                                                  )
-                                                : const Icon(Icons.edit),*/
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 6,
@@ -392,9 +380,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                         value: "1.12 pF",
                                         componentType: ComponentType.fullToroidTopload,
                                         componentAdded: coilProvider.hasTopload(),
-                                        onActionSelected: (DialogAction action) {
-                                          print("TAPPED at TOPLOAD $action");
-                                        },
+                                        onActionSelected: (DialogAction action) {},
                                       ),
                                     ),
                                     const SizedBox(
@@ -406,9 +392,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                         value: "Not added",
                                         componentType: ComponentType.helicalCoil,
                                         componentAdded: coilProvider.hasSecondaryCoil(),
-                                        onActionSelected: (DialogAction action) {
-                                          print("TAPPED at SECONDARY COIL $action");
-                                        },
+                                        onActionSelected: (DialogAction action) {},
                                       ),
                                     ),
                                   ],
@@ -416,14 +400,10 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                               ],
                             ),
                           ),
-                          Visibility(
-                            visible: !Util.isSolidStateCoil(Provider.of<CoilProvider>(context, listen: false).coil),
-                            child: CapBankContainer(),
-                          ),
                         ],
                       ),
                     ),
-                    Visibility(
+                    /*Visibility(
                       visible: Util.isSparkGapCoil(Provider.of<CoilProvider>(context, listen: false).coil) ? true : false,
                       child: BorderContainer(
                         child: Padding(
@@ -440,7 +420,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                           ),
                         ),
                       ),
-                    )
+                    )*/
                   ],
                 ),
               ),
@@ -622,7 +602,7 @@ class CoilComponent extends StatelessWidget implements DialogCallbacks {
   }
 }
 
-class PrimaryFrequencyContainer extends StatelessWidget {
+/*class PrimaryFrequencyContainer extends StatelessWidget {
   const PrimaryFrequencyContainer({
     Key? key,
     required this.primaryCoilTap,
@@ -653,8 +633,7 @@ class PrimaryFrequencyContainer extends StatelessWidget {
                   ),
                   title: const Text("Primary frequency"),
                   subtitle: Text(
-                    "",
-                    //displayResonantFrequency(coil.primary.frequency),
+                    coilProvider.displayPrimaryResonantFrequency() ?? "Missing primary components",
                     maxLines: 2,
                   ),
                   trailing: IconButton(
@@ -681,11 +660,11 @@ class PrimaryFrequencyContainer extends StatelessWidget {
                                 textColor: Colors.white,
                                 label: "ADD",
                                 onPressed: () {
-                                  /*if (coil.primary.inductance == 0) {
+                                  */ /*if (coil.primary.inductance == 0) {
                                   //TODO Navigate to secondary coil calculator
                                 } else if (coil.mmcBank.capacitance == 0) {
                                   //TODO Navigate to calculating mmc
-                                }*/
+                                }*/ /*
                                 }),
                           ),
                         );
@@ -738,7 +717,7 @@ class PrimaryFrequencyContainer extends StatelessWidget {
       },
     );
   }
-}
+}*/
 
 class CoilComponentWidget extends StatelessWidget {
   const CoilComponentWidget({
@@ -810,30 +789,6 @@ class CoilComponentWidget extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CapBankContainer extends StatelessWidget {
-  const CapBankContainer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BorderContainer(
-      child: ListTile(
-        leading: Image.asset(
-          "assets/caps_icon.png",
-          color: Colors.orange,
-          width: 42,
-          height: 42,
-        ),
-        title: Text("MMC capacitance"),
-        subtitle: Text("No data" //coil.mmcBank.capacitance.toStringAsFixed(4) + " nF",
-            //TODO Add MMC capacitance
-            ),
       ),
     );
   }
@@ -979,14 +934,16 @@ void openInformationDialog(
     builder: (context) {
       var dialog = ComponentInfoDialog(
         componentName: coil.coilInfo.coilName,
+        sideText: isPrimary ? "Primary" : "Secondary",
         assetImagePath: '',
         assetColor: Colors.blue,
         components: const [],
       );
       switch (type) {
         case ComponentType.capacitor:
-          dialog = const ComponentInfoDialog(
+          dialog = ComponentInfoDialog(
             componentName: "Capacitor",
+            sideText: isPrimary ? "Primary" : "Secondary",
             assetImagePath: '',
             assetColor: Colors.blue,
             components: [],
@@ -995,6 +952,7 @@ void openInformationDialog(
         case ComponentType.helicalCoil:
           dialog = ComponentInfoDialog(
             componentName: "Helical coil",
+            sideText: isPrimary ? "Primary" : "Secondary",
             assetImagePath: 'assets/helical_coil_icon.png',
             assetColor: Colors.orangeAccent,
             components: getComponentItems(coil, type, isPrimary),
@@ -1030,20 +988,24 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
         if (isPrimary) {
           final helicalCoil = coil.primaryCoil!;
 
+          final inductance = helicalCoil.inductance.toStringWithPrefix(3);
+          final wireDiameter = helicalCoil.wireDiameter.toStringWithPrefix();
+          final wireSpacing = helicalCoil.wireSpacing.toStringWithPrefix();
+
           components = [
             ComponentData(
               name: "Inductance",
-              value: Converter().convertToMicro(helicalCoil.inductance).toStringAsFixed(2) + " µH",
+              value: inductance.toHenry(), //Converter().convertToMicro(helicalCoil.inductance).toStringAsFixed(2) + " µH",
               imageAssetPath: "assets/icons/inductance_icon.png",
             ),
             ComponentData(
               name: "Wire diameter",
-              value: Converter().convertFromDefaultToMili(helicalCoil.wireDiameter).toStringAsFixed(2) + " mm",
+              value: wireDiameter.toMeter(),
               imageAssetPath: "assets/icons/diameter_icon.png",
             ),
             ComponentData(
               name: "Wire spacing",
-              value: helicalCoil.wireSpacing.toStringAsFixed(2) + " mm",
+              value: wireSpacing.toMeter(),
               imageAssetPath: "assets/icons/spacing_icon.png",
             ),
             ComponentData(

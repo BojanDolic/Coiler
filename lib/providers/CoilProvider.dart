@@ -2,6 +2,7 @@ import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/extension_functions.dart';
 import 'package:flutter/cupertino.dart';
 
 /// Provider for single selected coil
@@ -39,8 +40,21 @@ class CoilProvider extends ChangeNotifier {
   bool hasSecondaryCoil() => _coil.secondaryCoil != null;
 
   String? displayPrimaryInductance() {
-    final value = Converter().convertToMicro(_coil.primaryCoil?.inductance);
-    return (value > 0) ? value.toStringAsFixed(3) + " μH" : null;
+    final value = _coil.primaryCoil?.inductance;
+    if (value == null) {
+      return null;
+    }
+    return (value > 0) ? value.toStringWithPrefix(3).toHenry() : null;
+  }
+
+  String? displayPrimaryResonantFrequency() {
+    final frequency = _coil.coilInfo.primaryResonantFrequency;
+
+    if (frequency == 0) {
+      return null;
+    }
+
+    return frequency.toStringAsFixed(4);
   }
 
   String? displayPrimaryCapacitance() {

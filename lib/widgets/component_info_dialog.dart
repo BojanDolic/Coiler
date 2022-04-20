@@ -5,12 +5,14 @@ class ComponentInfoDialog extends StatelessWidget {
   const ComponentInfoDialog({
     Key? key,
     required this.componentName,
+    required this.sideText,
     required this.assetColor,
     required this.assetImagePath,
     required this.components,
   }) : super(key: key);
 
   final String assetImagePath;
+  final String sideText;
   final String componentName;
   final Color assetColor;
   final List<ComponentData> components;
@@ -32,6 +34,10 @@ class ComponentInfoDialog extends StatelessWidget {
           Text(
             componentName,
             style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          Text(
+            sideText,
+            style: Theme.of(context).textTheme.displaySmall,
           ),
           const SizedBox(
             height: 24,
