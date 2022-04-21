@@ -48,6 +48,7 @@ const biggerTextStyleOpenSans15 = TextStyle(
 
 const lightThemeBackgroundColor = Color(0xFFf9fcff);
 const darkThemeBackgroundColor = Color(0xFF1a1a1a);
+const darkAppBarBackgroundColor = Color(0xFF2a2a2a);
 
 final decimalOnlyTextFormatter = FilteringTextInputFormatter.allow(
   RegExp("(^(\\d*)((\\.{1})(\\d*))?)"),

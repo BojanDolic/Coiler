@@ -110,6 +110,9 @@ flutter:
       fonts:
         - asset: fonts/OpenSans-Light.ttf
         - asset: fonts/OpenSans-Regular.ttf
+        - asset: fonts/OpenSans-Bold.ttf
+        - asset: fonts/OpenSans-Medium.ttf
+        - asset: fonts/OpenSans-SemiBold.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
