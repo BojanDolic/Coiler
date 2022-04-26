@@ -88,6 +88,7 @@ class MyApp extends StatelessWidget {
             color: Colors.black54,
             fontSize: 14,
           ),
+          displayMedium: normalTextStyleOpenSans14,
         ),
         snackBarTheme: const SnackBarThemeData(
           backgroundColor: Color(0xFF2e2e2e),
@@ -109,6 +110,7 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           titleTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
           toolbarTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
+          backgroundColor: darkAppBarBackgroundColor,
           iconTheme: const IconThemeData(
             color: Colors.white,
           ),
@@ -131,6 +133,7 @@ class MyApp extends StatelessWidget {
             color: Colors.white54,
             fontSize: 14,
           ),
+          displayMedium: normalTextStyleOpenSans14.copyWith(color: Colors.white),
         ),
         listTileTheme: ListTileThemeData(
           textColor: Colors.white,
