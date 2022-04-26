@@ -32,9 +32,10 @@ class Coils extends Table {
   RealColumn get innerDiameter => real()();
 }
 
+@DataClassName("CoilCapacitor")
 class CapacitorBank extends Table {
   IntColumn get id => integer().nullable().autoIncrement()();
-  IntColumn get coil_id => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get coilId => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   RealColumn get capacitance => real()();
   IntColumn get voltage => integer()();
   IntColumn get seriesCapacitorCount => integer()();
@@ -42,11 +43,18 @@ class CapacitorBank extends Table {
   TextColumn get capacitorName => text().withDefault(const Constant(""))();
 }
 
+@DataClassName("CoilTopload")
 class Toploads extends Table {
   IntColumn get id => integer().nullable().autoIncrement()();
+  IntColumn get coilId => integer().nullable().customConstraint("UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
+  IntColumn get type => integer()();
+  RealColumn get capacitance => real()();
+  RealColumn get sphereDiameter => real()();
+  RealColumn get toroidMajorDiameter => real()();
+  RealColumn get toroidMinorDiameter => real()();
 }
 
-@DriftDatabase(tables: [Teslacoils, Coils], daos: [DriftCoilDao])
+@DriftDatabase(tables: [Teslacoils, Coils, CapacitorBank, Toploads], daos: [DriftCoilDao])
 class DriftCoilDatabase extends _$DriftCoilDatabase {
   DriftCoilDatabase(QueryExecutor e) : super(_openConnection());
 
