@@ -377,10 +377,40 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                     Expanded(
                                       child: CoilComponent(
                                         title: "Topload",
-                                        value: "1.12 pF",
+                                        value: coilProvider.getToploadCapacitance() ?? "Not added",
                                         componentType: ComponentType.fullToroidTopload,
                                         componentAdded: coilProvider.hasTopload(),
-                                        onActionSelected: (DialogAction action) {},
+                                        onActionSelected: (DialogAction action) {
+                                          switch (action) {
+                                            case DialogAction.onAdd:
+                                              {
+                                                if (coilProvider.coil.topload != null) {
+                                                  SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is already added.");
+                                                }
+                                                openToploadSelectDialog();
+                                                // TODO: Add topload addition
+                                              }
+                                              break;
+                                            case DialogAction.onEdit:
+                                              if (coilProvider.coil.topload == null) {
+                                                SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                              }
+                                              // TODO: Handle this case.
+                                              break;
+                                            case DialogAction.onInformation:
+                                              if (coilProvider.coil.topload == null) {
+                                                SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                              }
+                                              // TODO: Handle this case.
+                                              break;
+                                            case DialogAction.onDelete:
+                                              if (coilProvider.coil.topload == null) {
+                                                SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                              }
+                                              // TODO: Handle this case.
+                                              break;
+                                          }
+                                        },
                                       ),
                                     ),
                                     const SizedBox(
@@ -403,24 +433,6 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                         ],
                       ),
                     ),
-                    /*Visibility(
-                      visible: Util.isSparkGapCoil(Provider.of<CoilProvider>(context, listen: false).coil) ? true : false,
-                      child: BorderContainer(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: TextButton(
-                            child: Text("Calculate your spark gap distance\nTEST ADD HELICAL PRIMARY !"),
-                            onPressed: () async {
-                              final primary = PrimaryCoil(coilType: 2, turns: 10, inductance: 0.0000013);
-
-                              coilProvider.setPrimaryCoil(primary);
-
-                              await Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
-                            },
-                          ),
-                        ),
-                      ),
-                    )*/
                   ],
                 ),
               ),
@@ -455,7 +467,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                   color: Colors.orangeAccent,
                   onTap: () {
                     Navigator.pop(context);
-                    SnackbarUtil.showInfoSnackBar(context: context, text: "Currenty unavailable");
+                    SnackbarUtil.showInfoSnackBar(context: context, text: "Currently unavailable");
                   },
                 ),
                 const SizedBox(
@@ -481,6 +493,85 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
             ),
           );
         });
+  }
+
+  void openToploadSelectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Center(
+            child: Text(
+              "Select topload type",
+              style: theme.textTheme.headlineMedium,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                "Close",
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.blueAccent),
+              ),
+            ),
+          ],
+          actionsAlignment: MainAxisAlignment.center,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DialogCategoryWidget(
+                text: 'Sphere topload',
+                imageAsset: 'assets/sphere_icon.png',
+                color: Colors.blueAccent,
+                onTap: () {
+                  Navigator.pop(context);
+                  SnackbarUtil.showInfoSnackBar(context: context, text: "Currently unavailable");
+                },
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              DialogCategoryWidget(
+                text: 'Toroid topload',
+                imageAsset: 'assets/toroid_icon.png',
+                color: Colors.blueAccent,
+                onTap: () {
+                  Navigator.pop(context);
+/*
+                  if (coilFromChange) {
+                    if (Provider.of<CoilProvider>(context, listen: false).coil.primaryCoil?.coilType == ComponentType.helicalCoil.index) {
+                      //TODO return message that current coil type is the same as selected type
+                    } else {}
+                  }
+
+                  navigateToPrimaryCoilScreen();*/
+                },
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              DialogCategoryWidget(
+                text: 'Ring topload',
+                imageAsset: 'assets/ring_toroid_icon.png',
+                color: Colors.blueAccent,
+                onTap: () {
+                  Navigator.pop(context);
+                  SnackbarUtil.showInfoSnackBar(context: context, text: "Currently unavailable");
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void navigateToPrimaryCoilScreen() async {
@@ -601,123 +692,6 @@ class CoilComponent extends StatelessWidget implements DialogCallbacks {
     return imageColor;
   }
 }
-
-/*class PrimaryFrequencyContainer extends StatelessWidget {
-  const PrimaryFrequencyContainer({
-    Key? key,
-    required this.primaryCoilTap,
-  }) : super(key: key);
-
-  final VoidCallback primaryCoilTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<CoilProvider>(
-      builder: (context, coilProvider, child) {
-        return BorderContainer(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Visibility(
-                visible: !Util.isSolidStateCoil(Provider.of<CoilProvider>(context, listen: false).coil),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                  ),
-                  leading: Image.asset(
-                    "assets/resfreq_icon.png",
-                    color: Colors.blue,
-                    width: 42,
-                    height: 42,
-                  ),
-                  title: const Text("Primary frequency"),
-                  subtitle: Text(
-                    coilProvider.displayPrimaryResonantFrequency() ?? "Missing primary components",
-                    maxLines: 2,
-                  ),
-                  trailing: IconButton(
-                    onPressed: () {
-                      if (Util.hasPrimary(Provider.of<CoilProvider>(context, listen: false).coil)) {
-                        //TODO NAVIGATE TO FREQUENCY CALCULATION
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "You need to add primary components to calculate resonant frequency",
-                              style: normalTextStyleOpenSans14.copyWith(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                            duration: const Duration(seconds: 4),
-                            backgroundColor: Colors.blue.shade800, //const Color(0xFFc9383b),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(9),
-                            ),
-                            action: SnackBarAction(
-                                textColor: Colors.white,
-                                label: "ADD",
-                                onPressed: () {
-                                  */ /*if (coil.primary.inductance == 0) {
-                                  //TODO Navigate to secondary coil calculator
-                                } else if (coil.mmcBank.capacitance == 0) {
-                                  //TODO Navigate to calculating mmc
-                                }*/ /*
-                                }),
-                          ),
-                        );
-                      }
-                    },
-                    icon: Icon(Icons.edit),
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: !Util.isSolidStateCoil(Provider.of<CoilProvider>(context, listen: false).coil),
-                child: const SizedBox(
-                  height: 6,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Visibility(
-                    visible: !Util.isSolidStateCoil(Provider.of<CoilProvider>(context, listen: false).coil),
-                    child: CoilComponentWidget(
-                      assetName: "assets/caps_icon.png",
-                      value: "", //getBankCapText(coil),
-                      title: "MMC",
-                      backgroundColor: Colors.blue,
-                      isComponentAdded: true, //!(getBankCapText(coil) == "Not added"),
-                      onTap: () {
-                        //TODO Navigate to add or edit component
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 9,
-                  ),
-                  CoilComponentWidget(
-                    title: "Primary coil",
-                    value: hasHelicalCoil(Provider.of<CoilProvider>(context, listen: true).coil)
-                        ? "${Converter().convertUnits(coilProvider.coil.primaryCoil?.inductance, Units.DEFAULT, Units.MICRO).toStringAsFixed(4)} uH"
-                        : "Not added",
-                    assetName: "assets/helical_coil_icon.png",
-                    backgroundColor: Colors.orange,
-                    isComponentAdded: hasHelicalCoil(Provider.of<CoilProvider>(context, listen: true).coil),
-                    onTap: primaryCoilTap,
-                  ),
-                ],
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-}*/
 
 class CoilComponentWidget extends StatelessWidget {
   const CoilComponentWidget({
@@ -1023,7 +997,7 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
           components = [
             ComponentData(
               name: "Inductance",
-              value: Converter().convertToMicro(coil.primaryCoil?.inductance).toStringAsFixed(2) + " µH",
+              value: Converter().convertFromDefaultToMicro(coil.primaryCoil?.inductance).toStringAsFixed(2) + " µH",
               imageAssetPath: "assets/icons/inductance_icon.png",
             ),
             ComponentData(
@@ -1085,7 +1059,7 @@ class DialogCategoryWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      color: lightThemeBackgroundColor,
+      color: Theme.of(context).listTileTheme.tileColor, //lightThemeBackgroundColor
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -1104,7 +1078,7 @@ class DialogCategoryWidget extends StatelessWidget {
               ),
               Text(
                 text,
-                style: lightCategoryTextStyle,
+                style: Theme.of(context).textTheme.displaySmall,
               )
             ],
           ),
