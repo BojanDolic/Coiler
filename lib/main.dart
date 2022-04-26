@@ -11,8 +11,8 @@ import 'package:coiler_app/screens/coil_info_screen.dart';
 import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/screens/main_screen.dart';
-import 'package:coiler_app/util/constants.dart';
-import 'package:coiler_app/util/ui_constants.dart';
+import 'package:coiler_app/theme/darkTheme.dart';
+import 'package:coiler_app/theme/lightTheme.dart';
 import 'package:drift/native.dart';
 import 'package:drift_local_storage_inspector/drift_local_storage_inspector.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,92 +65,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          titleTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
-          toolbarTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
-          backgroundColor: lightThemeBackgroundColor,
-          iconTheme: const IconThemeData(
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: lightThemeBackgroundColor,
-        listTileTheme: ListTileThemeData(
-          tileColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade400),
-          ),
-        ),
-        textTheme: TextTheme(
-          headlineMedium: mediumHeadlineTextStyle,
-          displaySmall: lightCategoryTextStyle.copyWith(
-            color: Colors.black54,
-            fontSize: 14,
-          ),
-          displayMedium: normalTextStyleOpenSans14,
-        ),
-        snackBarTheme: const SnackBarThemeData(
-          backgroundColor: Color(0xFF2e2e2e),
-          contentTextStyle: normalSnackbarTextStyleOpenSans14,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.black87,
-        ),
-        popupMenuTheme: const PopupMenuThemeData(
-          color: Colors.white,
-        ),
-        dialogTheme: DialogTheme(
-          backgroundColor: lightThemeBackgroundColor,
-          contentTextStyle: normalTextStyleOpenSans14,
-          shape: roundedBorder16,
-        ),
-      ),
-      darkTheme: ThemeData(
-        appBarTheme: AppBarTheme(
-          titleTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
-          toolbarTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
-          backgroundColor: darkAppBarBackgroundColor,
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
-        ),
-        popupMenuTheme: PopupMenuThemeData(
-          color: darkThemeBackgroundColor,
-          textStyle: normalTextStyleOpenSans14.copyWith(
-            color: Colors.white,
-          ),
-        ),
-        primaryIconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.white70,
-        ),
-        textTheme: TextTheme(
-          headlineMedium: mediumHeadlineTextStyle.copyWith(color: Colors.white),
-          displaySmall: lightCategoryTextStyle.copyWith(
-            color: Colors.white54,
-            fontSize: 14,
-          ),
-          displayMedium: normalTextStyleOpenSans14.copyWith(color: Colors.white),
-        ),
-        listTileTheme: ListTileThemeData(
-          textColor: Colors.white,
-          tileColor: Colors.grey.shade900,
-          iconColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Colors.white12),
-          ),
-        ),
-        backgroundColor: darkThemeBackgroundColor,
-        dialogTheme: DialogTheme(
-          backgroundColor: darkThemeBackgroundColor,
-          contentTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white),
-          shape: roundedBorder16,
-        ),
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
       routes: {
         MainScreen.id: (context) => const MainScreen(
             // dao: driftDao,
