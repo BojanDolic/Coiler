@@ -62,6 +62,15 @@ class CoilProvider extends ChangeNotifier {
     return (capacitance > 0) ? capacitance.toStringAsFixed(3) + " nF" : null;
   }
 
+  String? getToploadCapacitance() {
+    final capacitance = _coil.topload?.capacitance;
+    if (capacitance == null) {
+      return null;
+    }
+
+    return (capacitance > 0) ? capacitance.toStringWithPrefix(3).toFarad() : null;
+  }
+
   ComponentType getPrimaryCoilComponentType() => ComponentType.values[_coil.primaryCoil?.coilType ?? 1];
   bool hasCapacitorBank() => _coil.mmc != null;
 

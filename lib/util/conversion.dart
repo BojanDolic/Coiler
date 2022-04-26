@@ -40,11 +40,15 @@ class Converter {
     return result;
   }
 
-  double convertToMicro(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MICRO);
+  double convertFromDefaultToMicro(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MICRO);
 
   double convertToDefault(dynamic value, Units from) => convertUnits(value, from, Units.DEFAULT);
 
   double convertFromDefaultToMili(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MILI);
+
+  double convertFromDefaultToPico(dynamic value) => convertUnits(value, Units.DEFAULT, Units.PICO);
+
+  double convertFromDefaultToNano(dynamic value) => convertUnits(value, Units.DEFAULT, Units.NANO);
 
   static String getCoilType(CoilType coilType) {
     switch (coilType) {
