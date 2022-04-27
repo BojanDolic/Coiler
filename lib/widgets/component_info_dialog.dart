@@ -46,24 +46,28 @@ class ComponentInfoDialog extends StatelessWidget {
             child: Container(
               width: double.maxFinite,
               child: ListView.builder(
-                shrinkWrap: true,
                 itemCount: components.length,
+                shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final component = components[index];
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      horizontalTitleGap: 6,
-                      title: Text(component.name),
-                      trailing: Text(component.value),
-                      leading: component.imageAssetPath != null
-                          ? ImageIcon(
-                              AssetImage(component.imageAssetPath!),
-                              color: assetColor,
-                              size: 26,
-                            )
-                          : null,
+                    child: Card(
+                      color: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      child: ListTile(
+                        horizontalTitleGap: 6,
+                        title: Text(component.name),
+                        trailing: Text(component.value),
+                        leading: component.imageAssetPath != null
+                            ? ImageIcon(
+                                AssetImage(component.imageAssetPath!),
+                                color: assetColor,
+                                size: 26,
+                              )
+                            : null,
+                      ),
                     ),
                   );
                 },

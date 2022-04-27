@@ -386,6 +386,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               {
                                                 if (coilProvider.coil.topload != null) {
                                                   SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is already added.");
+                                                  return;
                                                 }
                                                 openToploadSelectDialog();
                                                 // TODO: Add topload addition
@@ -394,18 +395,21 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                             case DialogAction.onEdit:
                                               if (coilProvider.coil.topload == null) {
                                                 SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                                return;
                                               }
                                               // TODO: Handle this case.
                                               break;
                                             case DialogAction.onInformation:
                                               if (coilProvider.coil.topload == null) {
                                                 SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                                return;
                                               }
-                                              // TODO: Handle this case.
+                                              openInformationDialog(context, coilProvider.coil, coilProvider.getToploadComponentType(), true);
                                               break;
                                             case DialogAction.onDelete:
                                               if (coilProvider.coil.topload == null) {
                                                 SnackbarUtil.showInfoSnackBar(context: context, text: "Topload is not added.");
+                                                return;
                                               }
                                               // TODO: Handle this case.
                                               break;
@@ -502,6 +506,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
         final theme = Theme.of(context);
 
         return AlertDialog(
+          scrollable: true,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -939,7 +944,13 @@ void openInformationDialog(
           // TODO: Handle this case.
           break;
         case ComponentType.fullToroidTopload:
-          // TODO: Handle this case.
+          dialog = ComponentInfoDialog(
+            componentName: "Toroid topload",
+            sideText: isPrimary ? "Primary" : "Secondary",
+            assetImagePath: 'assets/toroid_icon.png',
+            assetColor: Colors.blueAccent,
+            components: getComponentItems(coil, type, isPrimary),
+          );
           break;
         case ComponentType.sphereTopload:
           // TODO: Handle this case.

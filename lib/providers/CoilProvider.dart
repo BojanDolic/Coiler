@@ -71,6 +71,16 @@ class CoilProvider extends ChangeNotifier {
     return (capacitance > 0) ? capacitance.toStringWithPrefix(3).toFarad() : null;
   }
 
+  ComponentType getToploadComponentType() {
+    final topload = _coil.topload;
+
+    if (topload == null) {
+      return ComponentType.values[4]; // Default to toroid topload
+    }
+
+    return ComponentType.values[topload.type];
+  }
+
   ComponentType getPrimaryCoilComponentType() => ComponentType.values[_coil.primaryCoil?.coilType ?? 1];
   bool hasCapacitorBank() => _coil.mmc != null;
 
