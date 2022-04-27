@@ -2,7 +2,6 @@ import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
 import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
-import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
 
 class CalculatorsScreen extends StatelessWidget {
@@ -30,9 +29,8 @@ class CalculatorsScreen extends StatelessWidget {
               /*const SizedBox(
                 height: 12,
               ),*/
-              CalculatorItem2(
+              CalculatorItem(
                 title: "MMC (Multi-Mini-Capacitor)",
-                iconColor: Colors.blue,
                 gradientColor: ColorUtil.blueGradient,
                 icon: Image.asset(
                   "assets/caps_icon.png",
@@ -44,9 +42,8 @@ class CalculatorsScreen extends StatelessWidget {
                   Navigator.pushNamed(context, CapacitorScreen.id);
                 },
               ),
-              CalculatorItem2(
+              CalculatorItem(
                 title: "Resonant frequency",
-                iconColor: Colors.orangeAccent,
                 gradientColor: ColorUtil.orangeGradient,
                 icon: Image.asset(
                   "assets/resfreq_icon.png",
@@ -58,9 +55,8 @@ class CalculatorsScreen extends StatelessWidget {
                   Navigator.pushNamed(context, ResonantFrequencyScreen.id);
                 },
               ),
-              CalculatorItem2(
+              CalculatorItem(
                 title: "Inductance of helical coil",
-                iconColor: Colors.green,
                 gradientColor: ColorUtil.greenGradient,
                 icon: Image.asset(
                   "assets/helical_coil_icon.png",
@@ -72,9 +68,8 @@ class CalculatorsScreen extends StatelessWidget {
                   Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id);
                 },
               ),
-              CalculatorItem2(
+              CalculatorItem(
                 title: "Inductance of flat coil",
-                iconColor: Colors.green,
                 gradientColor: ColorUtil.pinkGradient,
                 icon: Image.asset(
                   "assets/flat_coil_icon.png",
@@ -86,58 +81,45 @@ class CalculatorsScreen extends StatelessWidget {
                   //TODO add navigation to flat coil calculation
                 },
               ),
-
-              /*CalculatorItem(
-                title: "MMC (Multi-Mini-Capacitor)",
-                backColor: Colors.blue,
+              CalculatorItem(
+                title: "Sphere topload capacitance",
+                gradientColor: ColorUtil.tealGradient,
                 icon: Image.asset(
-                  "assets/caps_icon.png",
-                  color: Colors.white,
-                  width: 26,
-                  height: 26,
+                  "assets/sphere_icon.png",
+                  color: ColorUtil.teal,
+                  width: 32,
+                  height: 32,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, CapacitorScreen.id);
+                  //TODO add navigation to flat coil calculation
                 },
               ),
               CalculatorItem(
-                title: "Resonant frequency",
-                backColor: Colors.orangeAccent,
+                title: "Toroid topload capacitance",
+                gradientColor: ColorUtil.purpleGradient,
                 icon: Image.asset(
-                  "assets/resfreq_icon.png",
-                  color: Colors.white,
-                  width: 26,
-                  height: 26,
+                  "assets/full_toroid_icon.png",
+                  color: ColorUtil.purple,
+                  width: 32,
+                  height: 32,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, ResonantFrequencyScreen.id);
+                  //TODO add navigation to flat coil calculation
                 },
               ),
               CalculatorItem(
-                title: "Inductance of helical coil",
-                backColor: Colors.green,
+                title: "Ring toroid topload capacitance",
+                gradientColor: ColorUtil.lightOrangeGradient,
                 icon: Image.asset(
-                  "assets/helical_coil_icon.png",
-                  color: Colors.white,
-                  width: 26,
-                  height: 26,
+                  "assets/ring_toroid_icon.png",
+                  color: ColorUtil.lightOrange,
+                  width: 32,
+                  height: 32,
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, HelicalCoilCalculatorScreen.id);
+                  //TODO add navigation to flat coil calculation
                 },
               ),
-              CalculatorItem(
-                title: "Inductance of flat coil",
-                backColor: Colors.pinkAccent,
-                icon: Image.asset(
-                  "assets/flat_coil_icon.png",
-                  color: Colors.white,
-                  width: 26,
-                  height: 26,
-                ),
-                onTap: () {
-                },
-              ),*/
             ],
           ),
         ),
@@ -146,17 +128,15 @@ class CalculatorsScreen extends StatelessWidget {
   }
 }
 
-class CalculatorItem2 extends StatelessWidget {
-  const CalculatorItem2({
+class CalculatorItem extends StatelessWidget {
+  const CalculatorItem({
     Key? key,
-    required this.iconColor,
     required this.gradientColor,
     required this.icon,
     required this.title,
     required this.onTap,
   }) : super(key: key);
 
-  final Color iconColor;
   final Color gradientColor;
   final Image icon;
   final String title;
@@ -210,6 +190,7 @@ class CalculatorItem2 extends StatelessWidget {
   }
 }
 
+/*
 class CalculatorItem extends StatelessWidget {
   const CalculatorItem({
     Key? key,
@@ -243,3 +224,4 @@ class CalculatorItem extends StatelessWidget {
     );
   }
 }
+*/
