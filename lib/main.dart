@@ -2,6 +2,7 @@ import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/database/drift_coil_database.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
+import 'package:coiler_app/providers/FrequencyProvider.dart';
 import 'package:coiler_app/providers/HelicalCalculatorProvider.dart';
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
@@ -73,7 +74,10 @@ class MyApp extends StatelessWidget {
             ),
         CalculatorsScreen.id: (context) => const CalculatorsScreen(),
         CapacitorScreen.id: (context) => const CapacitorScreen(),
-        ResonantFrequencyScreen.id: (context) => const ResonantFrequencyScreen(),
+        ResonantFrequencyScreen.id: (context) => ChangeNotifierProvider<ResonantFrequencyProvider>(
+              create: (context) => ResonantFrequencyProvider(),
+              child: const ResonantFrequencyScreen(),
+            ),
         /*HelicalCoilCalculatorScreen.id: (context) =>
             const HelicalCoilCalculatorScreen(),*/
         CoilsListScreen.id: (context) => const CoilsListScreen(),

@@ -7,7 +7,7 @@ const capacitanceDropDownList = [
     value: Constants.Units.DEFAULT,
   ),
   DropdownMenuItem(
-    child: Text("uF"),
+    child: Text("µF"),
     value: Constants.Units.MICRO,
   ),
   DropdownMenuItem(
@@ -30,7 +30,7 @@ const inductanceDropDownList = [
     value: Constants.Units.MILI,
   ),
   DropdownMenuItem(
-    child: Text("uH"),
+    child: Text("µH"),
     value: Constants.Units.MICRO,
   ),
   DropdownMenuItem(
