@@ -29,7 +29,7 @@ class BorderContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).canvasColor,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: padding,

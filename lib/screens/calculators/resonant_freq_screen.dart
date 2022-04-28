@@ -1,6 +1,8 @@
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/input_field_dropdown.dart';
@@ -13,8 +15,7 @@ class ResonantFrequencyScreen extends StatefulWidget {
   static String id = "/calculators/resfreq";
 
   @override
-  _ResonantFrequencyScreenState createState() =>
-      _ResonantFrequencyScreenState();
+  _ResonantFrequencyScreenState createState() => _ResonantFrequencyScreenState();
 }
 
 class _ResonantFrequencyScreenState extends State<ResonantFrequencyScreen> {
@@ -39,15 +40,11 @@ class _ResonantFrequencyScreenState extends State<ResonantFrequencyScreen> {
     var capacitanceTemp = double.tryParse(capacitance);
 
     if (inductanceTemp != 0 && capacitanceTemp != 0) {
-      var inductance = Converter()
-          .convertUnits(inductanceTemp, inductanceUnit, Units.DEFAULT);
-      var capacitance = Converter()
-          .convertUnits(capacitanceTemp, capacitanceUnit, Units.DEFAULT);
+      var inductance = Converter().convertUnits(inductanceTemp, inductanceUnit, Units.DEFAULT);
+      var capacitance = Converter().convertUnits(capacitanceTemp, capacitanceUnit, Units.DEFAULT);
 
-      var frequencyTemp =
-          Calculator().calculateResFrequency(inductance, capacitance);
-      var frequency =
-          Converter().convertUnits(frequencyTemp, Units.DEFAULT, frequencyUnit);
+      var frequencyTemp = Calculator().calculateResFrequency(inductance, capacitance);
+      var frequency = Converter().convertUnits(frequencyTemp, Units.DEFAULT, frequencyUnit);
 
       setState(() {
         this.frequency = frequency.toStringAsFixed(4);
@@ -57,8 +54,9 @@ class _ResonantFrequencyScreenState extends State<ResonantFrequencyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.backgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -75,23 +73,23 @@ class _ResonantFrequencyScreenState extends State<ResonantFrequencyScreen> {
                   Align(
                     alignment: Alignment.center,
                     child: BorderContainer(
-                      elevated: true,
                       child: Column(
                         children: [
                           Image.asset(
                             "assets/lc_circuit.png",
                             height: 200,
+                            color: context.isDarkTheme() ? Colors.white : Colors.black87,
                           ),
                           Text(
                             "Calculate resonant frequency of your LC circuit by entering values below.",
-                            style: normalTextStyleOpenSans14,
+                            style: theme.textTheme.displayMedium,
                             textAlign: TextAlign.center,
                           )
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   BorderContainer(
@@ -99,18 +97,22 @@ class _ResonantFrequencyScreenState extends State<ResonantFrequencyScreen> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Frequency: $frequency"),
+                        Text(
+                          "Frequency: $frequency",
+                          style: theme.textTheme.displaySmall,
+                        ),
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 9,
                           ),
                           decoration: BoxDecoration(
-                            color: lightBlueColor,
+                            color: context.isDarkTheme() ? Colors.grey.shade800 : ColorUtil.lightestBlue,
                             borderRadius: BorderRadius.circular(9),
                           ),
                           child: DropdownButton<Units>(
                               value: frequencyUnit,
                               items: frequencyDropDownList,
+                              style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
                               borderRadius: BorderRadius.circular(9),
                               underline: Container(),
                               onChanged: (value) {
