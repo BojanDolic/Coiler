@@ -1,3 +1,4 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/ui_constants.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ final darkTheme = ThemeData(
     color: Colors.white70,
   ),
   textTheme: TextTheme(
-    headlineMedium: mediumHeadlineTextStyle.copyWith(color: Colors.white),
+    headlineMedium: mediumHeadlineTextStyle.copyWith(color: ColorUtil.whiteHeadline),
     displaySmall: lightCategoryTextStyle.copyWith(
       color: Colors.white54,
       fontSize: 14,
@@ -40,7 +41,7 @@ final darkTheme = ThemeData(
     iconColor: Colors.white,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
-      side: const BorderSide(color: Colors.white12),
+      side: const BorderSide(color: ColorUtil.borderColor),
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
