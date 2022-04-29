@@ -77,7 +77,7 @@ class InputFieldDropDown extends StatelessWidget {
         labelText: labelText,
         errorText: errorText,
         hintStyle: theme.inputDecorationTheme.labelStyle,
-        labelStyle: theme.inputDecorationTheme.labelStyle, //theme.textTheme.displayMedium, // (errorText == null) ? theme.primaryColor : Colors.red
+        labelStyle: theme.inputDecorationTheme.labelStyle,
         floatingLabelStyle: MaterialStateTextStyle.resolveWith((states) {
           var color = theme.textTheme.displayMedium?.color;
 
@@ -86,12 +86,10 @@ class InputFieldDropDown extends StatelessWidget {
           } else if (states.contains(MaterialState.focused)) {
             color = theme.primaryColor;
           }
-
-          //final color = (states.contains(MaterialState.error)) ? Colors.red : theme.primaryColor;
           return (theme.inputDecorationTheme.floatingLabelStyle?.copyWith(color: color))!;
         }),
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red),
+          borderSide: BorderSide(color: theme.primaryColor),
           borderRadius: BorderRadius.circular(9),
         ),
         enabledBorder: theme.inputDecorationTheme.enabledBorder,

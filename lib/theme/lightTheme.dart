@@ -48,7 +48,7 @@ final lightTheme = ThemeData(
       borderSide: BorderSide(color: Colors.grey.shade400, width: 1.2),
       borderRadius: BorderRadius.circular(9),
     ),
-    labelStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white54),
+    labelStyle: normalTextStyleOpenSans14.copyWith(color: Colors.grey.shade600),
     floatingLabelStyle: lightCategoryTextStyle.copyWith(color: Colors.white54, fontWeight: FontWeight.bold),
   ),
 );

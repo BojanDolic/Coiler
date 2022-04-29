@@ -1,12 +1,14 @@
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/ui_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 final darkTheme = ThemeData(
   appBarTheme: AppBarTheme(
     titleTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
     toolbarTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
     backgroundColor: darkAppBarBackgroundColor,
+    systemOverlayStyle: SystemUiOverlayStyle.light,
     iconTheme: const IconThemeData(
       color: Colors.white,
     ),
