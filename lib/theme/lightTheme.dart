@@ -11,6 +11,7 @@ final lightTheme = ThemeData(
       color: Colors.black87,
     ),
   ),
+  canvasColor: Colors.white,
   backgroundColor: lightThemeBackgroundColor,
   listTileTheme: ListTileThemeData(
     tileColor: Colors.white,
@@ -41,5 +42,13 @@ final lightTheme = ThemeData(
     backgroundColor: lightThemeBackgroundColor,
     contentTextStyle: normalTextStyleOpenSans14,
     shape: roundedBorder16,
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey.shade400, width: 1.2),
+      borderRadius: BorderRadius.circular(9),
+    ),
+    labelStyle: normalTextStyleOpenSans14.copyWith(color: Colors.grey.shade600),
+    floatingLabelStyle: lightCategoryTextStyle.copyWith(color: Colors.white54, fontWeight: FontWeight.bold),
   ),
 );

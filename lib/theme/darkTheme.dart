@@ -1,16 +1,19 @@
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/ui_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 final darkTheme = ThemeData(
   appBarTheme: AppBarTheme(
     titleTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
     toolbarTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
     backgroundColor: darkAppBarBackgroundColor,
+    systemOverlayStyle: SystemUiOverlayStyle.light,
     iconTheme: const IconThemeData(
       color: Colors.white,
     ),
   ),
+  canvasColor: Colors.grey.shade900,
   popupMenuTheme: PopupMenuThemeData(
     color: darkThemeBackgroundColor,
     textStyle: normalTextStyleOpenSans14.copyWith(
@@ -29,7 +32,7 @@ final darkTheme = ThemeData(
       color: Colors.white54,
       fontSize: 14,
     ),
-    displayMedium: normalTextStyleOpenSans14.copyWith(color: Colors.white),
+    displayMedium: normalTextStyleOpenSans14.copyWith(color: Colors.white54),
   ),
   listTileTheme: ListTileThemeData(
     textColor: Colors.white,
@@ -39,6 +42,14 @@ final darkTheme = ThemeData(
       borderRadius: BorderRadius.circular(16),
       side: const BorderSide(color: Colors.white12),
     ),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.grey.shade700, width: 1.2),
+      borderRadius: BorderRadius.circular(9),
+    ),
+    labelStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white54),
+    floatingLabelStyle: lightCategoryTextStyle.copyWith(color: Colors.white54, fontWeight: FontWeight.bold),
   ),
   backgroundColor: darkThemeBackgroundColor,
   dialogTheme: DialogTheme(

@@ -1,4 +1,6 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,6 +34,7 @@ class InputFieldDropDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: (value) => onTextChanged(value),
@@ -39,6 +42,7 @@ class InputFieldDropDown extends StatelessWidget {
       controller: controller,
       keyboardType: inputType,
       inputFormatters: inputFormatters,
+      style: theme.textTheme.displayMedium,
       decoration: InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(
@@ -50,7 +54,7 @@ class InputFieldDropDown extends StatelessWidget {
               horizontal: 12,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xffe1efff),
+              color: context.isDarkTheme() ? Colors.grey.shade800 : ColorUtil.lightestBlue, //const Color(0xffe1efff),
               borderRadius: BorderRadius.circular(9),
             ),
             child: Align(
@@ -59,7 +63,8 @@ class InputFieldDropDown extends StatelessWidget {
               child: DropdownButton<Units>(
                 borderRadius: BorderRadius.circular(9),
                 value: dropDownValue,
-                style: normalTextStyleOpenSans14.copyWith(color: Colors.black87),
+                style:
+                    theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold), //normalTextStyleOpenSans14.copyWith(color: Colors.black87),
                 underline: Container(),
                 items: dropDownList,
                 onChanged: (value) => onDropDownChanged(value),
@@ -71,10 +76,35 @@ class InputFieldDropDown extends StatelessWidget {
         hintText: hintText,
         labelText: labelText,
         errorText: errorText,
+        hintStyle: theme.inputDecorationTheme.labelStyle,
+        labelStyle: theme.inputDecorationTheme.labelStyle,
+        floatingLabelStyle: MaterialStateTextStyle.resolveWith((states) {
+          var color = theme.textTheme.displayMedium?.color;
+
+          if (states.contains(MaterialState.error)) {
+            color = Colors.red;
+          } else if (states.contains(MaterialState.focused)) {
+            color = theme.primaryColor;
+          }
+          return (theme.inputDecorationTheme.floatingLabelStyle?.copyWith(color: color))!;
+        }),
         border: OutlineInputBorder(
+          borderSide: BorderSide(color: theme.primaryColor),
           borderRadius: BorderRadius.circular(9),
         ),
+        enabledBorder: theme.inputDecorationTheme.enabledBorder,
       ),
     );
+  }
+
+  TextStyle? getLabelStyle(ThemeData theme, Set<MaterialState> states) {
+    var style = theme.inputDecorationTheme.labelStyle;
+
+    if (states.contains(MaterialState.focused)) {
+      style = theme.inputDecorationTheme.labelStyle?.copyWith(color: theme.primaryColor);
+    } else if (states.contains(MaterialState.error)) {
+      style = theme.inputDecorationTheme.labelStyle?.copyWith(color: Colors.red);
+    }
+    return style!;
   }
 }

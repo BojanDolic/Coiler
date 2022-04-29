@@ -1,3 +1,4 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:flutter/material.dart';
 
 /// [backgroundImage] is image asset path which displays image in the background of the container with certain opacity.
@@ -29,13 +30,13 @@ class BorderContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).canvasColor,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: padding,
         decoration: BoxDecoration(
           boxShadow: (elevated != null && elevated != false) ? shadows : [],
-          border: Border.all(color: Colors.black26),
+          border: Border.all(color: ColorUtil.borderColor), //Colors.black26
           borderRadius: BorderRadius.circular(16),
           image: backgroundImage != null
               ? DecorationImage(
