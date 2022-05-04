@@ -1,7 +1,7 @@
 import 'package:coiler_app/screens/calculators_screen.dart';
 import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
-import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,112 +9,107 @@ class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   static const String id = "/main";
-  //final DriftCoilDao dao;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: theme.backgroundColor,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/tcoil_icon.png",
-                    width: 76,
-                    height: 76,
-                  ),
-                  Text(
-                    "Coiler",
-                    style: TextStyle(
-                      fontFamily: "OpenSans",
-                      fontWeight: FontWeight.w900,
-                      fontSize: 48,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      "assets/tcoil_icon.png",
+                      width: 76,
+                      height: 76,
                     ),
-                  ),
-                  Text(
-                    "Simple app for tesla coil calculations",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: "OpenSans",
+                    Text(
+                      "Coiler",
+                      style: theme.textTheme.headlineMedium?.copyWith(fontSize: 48),
                     ),
-                  ),
-                ],
+                    Text(
+                      "Simple app for tesla coil calculations",
+                      style: theme.textTheme.displaySmall,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(
+                height: 26,
             ),
-            SizedBox(
-              height: 26,
-            ),
-            CategoryCard(
-              title: "Calculation",
-              description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
-              image: Image.asset(
-                "assets/math_icon.png",
-                height: 42,
-                width: 42,
-                color: Colors.blue,
+              CategoryCard(
+                title: "Calculation",
+                description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
+                image: Image.asset(
+                  "assets/math_icon.png",
+                  height: 42,
+                  width: 42,
+                  color: Colors.blue,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, CalculatorsScreen.id);
+                },
               ),
-              onTap: () {
-                Navigator.pushNamed(context, CalculatorsScreen.id);
-              },
+              CategoryCard(
+                title: "Your coils",
+                description: "Here you can find all of your tesla coils.",
+                image: Image.asset(
+                  "assets/tesla_coil_outline_icon.png",
+                  height: 42,
+                  width: 42,
+                  color: Colors.orange,
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, CoilsListScreen.id);
+                },
             ),
-            CategoryCard(
-              title: "Your coils",
-              description: "Here you can find all of your tesla coils.",
-              image: Image.asset(
-                "assets/tesla_coil_outline_icon.png",
-                height: 42,
-                width: 42,
-                color: Colors.orange,
+              CategoryCard(
+                title: "Design guides",
+                description: "Read about best practices when building coils and common mistakes to avoid.",
+                image: Image.asset(
+                  "assets/design_icon.png",
+                  height: 42,
+                  width: 42,
+                  color: Colors.red,
+                ),
+                onTap: () {
+                  //TODO Navigate to...
+                },
               ),
-              onTap: () {
-                Navigator.pushNamed(context, CoilsListScreen.id);
-              },
-            ),
-            CategoryCard(
-              title: "Design guides",
-              description: "Read about best practices when building coils and common mistakes to avoid.",
-              image: Image.asset(
-                "assets/design_icon.png",
-                height: 42,
-                width: 42,
-                color: Colors.red,
+              CategoryCard(
+                title: "Miscellaneous",
+                description: "Other things you can find useful.",
+                image: Image.asset(
+                  "assets/misc_icon.png",
+                  height: 42,
+                  width: 42,
+                  color: Colors.green,
+                ),
+                onTap: () {
+                  //TODO Navigate to...
+                },
               ),
-              onTap: () {
-                //TODO Navigate to...
-              },
-            ),
-            CategoryCard(
-              title: "Miscellaneous",
-              description: "Other things you can find useful.",
-              image: Image.asset(
-                "assets/misc_icon.png",
-                height: 42,
-                width: 42,
-                color: Colors.green,
+              CategoryCard(
+                title: "Information",
+                description: "Here you can find information about this app.",
+                image: Image.asset(
+                  "assets/info_icon.png",
+                  height: 42,
+                  width: 42,
+                  color: Colors.purple,
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed(InformationScreen.id);
+                },
               ),
-              onTap: () {
-                //TODO Navigate to...
-              },
-            ),
-            CategoryCard(
-              title: "Information",
-              description: "Here you can find information about this app.",
-              image: Image.asset(
-                "assets/info_icon.png",
-                height: 42,
-                width: 42,
-                color: Colors.purple,
-              ),
-              onTap: () {
-                Navigator.of(context).pushNamed(InformationScreen.id);
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -122,7 +117,14 @@ class MainScreen extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-  const CategoryCard({Key? key, required this.image, required this.title, required this.description, required this.onTap}) : super(key: key);
+
+  const CategoryCard({
+    Key? key,
+    required this.image,
+    required this.title,
+    required this.description,
+    required this.onTap,
+  }) : super(key: key);
 
   final String title;
   final String description;
@@ -131,6 +133,7 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 16,
@@ -141,7 +144,7 @@ class CategoryCard extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black26),
+            border: Border.all(color: ColorUtil.borderColor),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -162,7 +165,7 @@ class CategoryCard extends StatelessWidget {
                       ),
                       child: Text(
                         title,
-                        style: boldCategoryTextStyle,
+                        style: theme.textTheme.headlineMedium,
                         maxLines: 1,
                       ),
                     ),
@@ -176,7 +179,7 @@ class CategoryCard extends StatelessWidget {
                       ),
                       child: Text(
                         description,
-                        style: lightCategoryTextStyle,
+                        style: theme.textTheme.displaySmall,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
