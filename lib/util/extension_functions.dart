@@ -39,7 +39,9 @@ extension StringSuffix on double {
       return toStringAsFixed(decimal ?? 2);
     } else if (zeros >= 1 && zeros < 3) {
       return converter.convertFromDefaultToMili(this).toStringAsFixed(decimal ?? 2) + " m";
-    } else if (zeros >= 3 && zeros < 6) {
+    } else if (zeros == 3) {
+      return converter.convertFromDefaultToMili(this).toStringAsFixed(decimal ?? 2) + " m";
+    } else if (zeros > 3 && zeros < 6) {
       return converter.convertFromDefaultToMicro(this).toStringAsFixed(decimal ?? 2) + " µ";
     } else if (zeros >= 6 && zeros < 9) {
       return converter.convertFromDefaultToNano(this).toStringAsFixed(decimal ?? 2) + " n";

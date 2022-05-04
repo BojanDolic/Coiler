@@ -42,7 +42,7 @@ class MainScreen extends StatelessWidget {
               ),
               const SizedBox(
                 height: 26,
-              ),
+            ),
               CategoryCard(
                 title: "Calculation",
                 description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
@@ -68,7 +68,7 @@ class MainScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(context, CoilsListScreen.id);
                 },
-              ),
+            ),
               CategoryCard(
                 title: "Design guides",
                 description: "Read about best practices when building coils and common mistakes to avoid.",
@@ -117,6 +117,7 @@ class MainScreen extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
+
   const CategoryCard({
     Key? key,
     required this.image,
