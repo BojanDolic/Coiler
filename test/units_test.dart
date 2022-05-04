@@ -52,11 +52,11 @@ void main() {
       expect(result, "55.00 µ");
     });
 
-    test("UNIT TEST 8 | 550.00 µ", () {
+    test("UNIT TEST 8 | 0.55 m", () {
       const double testValue8 = 0.00055;
       var result = testValue8.toStringWithPrefix();
 
-      expect(result, "550.00 µ");
+      expect(result, "0.55 m");
     });
 
     test("UNIT TEST 9 | 5.50 m", () {

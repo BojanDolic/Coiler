@@ -1,12 +1,9 @@
-import 'package:coiler_app/dao/DriftCoilDao.dart';
-import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/screens/calculators_screen.dart';
 import 'package:coiler_app/screens/coils_list_screen.dart';
 import 'package:coiler_app/screens/information_screen.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -54,8 +51,7 @@ class MainScreen extends StatelessWidget {
             ),
             CategoryCard(
               title: "Calculation",
-              description:
-                  "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
+              description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
               image: Image.asset(
                 "assets/math_icon.png",
                 height: 42,
@@ -81,8 +77,7 @@ class MainScreen extends StatelessWidget {
             ),
             CategoryCard(
               title: "Design guides",
-              description:
-                  "Read about best practices when building coils and common mistakes to avoid.",
+              description: "Read about best practices when building coils and common mistakes to avoid.",
               image: Image.asset(
                 "assets/design_icon.png",
                 height: 42,
@@ -119,26 +114,6 @@ class MainScreen extends StatelessWidget {
                 Navigator.of(context).pushNamed(InformationScreen.id);
               },
             ),
-            TextButton(
-              onPressed: () async {
-                //await dao.insertCoil(Coil(id: null, name: "Testić"));
-                Provider.of<DriftCoilDao>(context, listen: false)
-                    .getCoils()
-                    .listen(
-                  (event) {
-                    if (event.isNotEmpty) {
-                      for (Coil coil in event) {
-                        print(coil.coilInfo.coilName);
-                        print(coil.coilInfo.coilType);
-                      }
-                    } else {
-                      print("Empty");
-                    }
-                  },
-                );
-              },
-              child: Text("TEST DAO"),
-            ),
           ],
         ),
       ),
@@ -147,13 +122,7 @@ class MainScreen extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-  const CategoryCard(
-      {Key? key,
-      required this.image,
-      required this.title,
-      required this.description,
-      required this.onTap})
-      : super(key: key);
+  const CategoryCard({Key? key, required this.image, required this.title, required this.description, required this.onTap}) : super(key: key);
 
   final String title;
   final String description;
@@ -222,98 +191,3 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
-
-/*class CategoryCard extends StatelessWidget {
-  const CategoryCard({
-    Key? key,
-    required this.backgroundColor,
-    required this.onTap,
-    this.title = "",
-    this.description = "",
-    required this.icon,
-  }) : super(key: key);
-
-  final String title;
-  final String description;
-  final Widget? icon;
-  final Color backgroundColor;
-  final Function() onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 16,
-        horizontal: 9,
-      ),
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: onTap,
-            child: Container(
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 42,
-                  left: 9,
-                  right: 9,
-                  bottom: 9,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Text(
-                      title,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: const TextStyle(
-                          fontFamily: "OpenSans",
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16),
-                    ),
-                    const SizedBox(
-                      height: 7,
-                    ),
-                    Expanded(
-                      child: Text(
-                        description,
-                        style: const TextStyle(
-                            fontFamily: "OpenSans",
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black26,
-                            fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              height: 130,
-              width: double.infinity,
-            ),
-          ),
-          Positioned(
-            top: -20,
-            left: 15,
-            child: SizedBox(
-              width: 52,
-              height: 52,
-              child: FittedBox(
-                child: FloatingActionButton.small(
-                  onPressed: null,
-                  backgroundColor: Colors.white,
-                  clipBehavior: Clip.none,
-                  child: icon,
-                ),
-              ),
-            ),
-          ),
-        ],
-        clipBehavior: Clip.none,
-      ),
-    );
-  }
-}*/
