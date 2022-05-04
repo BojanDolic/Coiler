@@ -9,7 +9,6 @@ class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   static const String id = "/main";
-  //final DriftCoilDao dao;
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +32,6 @@ class MainScreen extends StatelessWidget {
                     Text(
                       "Coiler",
                       style: theme.textTheme.headlineMedium?.copyWith(fontSize: 48),
-
-                      /*TextStyle(
-                        fontFamily: "OpenSans",
-                        fontWeight: FontWeight.w900,
-                        fontSize: 48,
-                      ),*/
                     ),
                     Text(
                       "Simple app for tesla coil calculations",
@@ -47,7 +40,7 @@ class MainScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 26,
               ),
               CategoryCard(
@@ -124,7 +117,13 @@ class MainScreen extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-  const CategoryCard({Key? key, required this.image, required this.title, required this.description, required this.onTap}) : super(key: key);
+  const CategoryCard({
+    Key? key,
+    required this.image,
+    required this.title,
+    required this.description,
+    required this.onTap,
+  }) : super(key: key);
 
   final String title;
   final String description;
