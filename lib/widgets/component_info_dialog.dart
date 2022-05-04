@@ -56,6 +56,7 @@ class ComponentInfoDialog extends StatelessWidget {
                     child: Card(
                       color: Colors.transparent,
                       shadowColor: Colors.transparent,
+                      elevation: 0,
                       child: ListTile(
                         horizontalTitleGap: 6,
                         title: Text(component.name),
