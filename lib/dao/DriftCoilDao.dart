@@ -54,6 +54,24 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
     //onConflict: DoUpdate((old) => );
   }
 
+  Future updatePrimaryCoil(Coil coil) {
+    return (update(coils)
+          ..where(
+            (tbl) => tbl.id.equals(coil.id),
+          ))
+        .write(
+      CoilForm(
+        type: coil.primaryCoil?.coilType ?? 0,
+        turns: coil.primaryCoil?.turns ?? 0,
+        inductance: coil.primaryCoil?.inductance ?? 0.0,
+        wireDiameter: coil.primaryCoil?.wireDiameter ?? 0.0,
+        wireSpacing: coil.primaryCoil?.wireSpacing ?? 0.0,
+        coilDiameter: coil.primaryCoil?.coilDiameter ?? 0.0,
+        innerDiameter: coil.primaryCoil?.innerDiameter ?? 0.0,
+      ),
+    );
+  }
+
   Future insertTopload(Coil coil) {
     final topload = coil.topload;
 
