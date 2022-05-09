@@ -317,6 +317,8 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               return;
                                             }
 
+                                            navigateToPrimaryCoilScreen(ComponentType.helicalCoil, false);
+
                                             //TODO navigate to edit screen
 
                                           } else if (action == DialogAction.onDelete) {
@@ -325,15 +327,17 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               return;
                                             }
 
-                                            await Provider.of<DriftCoilDao>(context, listen: false)
-                                                .deletePrimary(coilProvider.coil)
-                                                .catchError((err) {
-                                              SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error while deleting primary!");
-                                              return;
-                                            });
-
-                                            coilProvider.removePrimaryCoil();
-                                            SnackbarUtil.showInfoSnackBar(context: context, text: "Primary coil deleted");
+                                            await Provider.of<DriftCoilDao>(context, listen: false).deletePrimary(coilProvider.coil).then(
+                                              (value) {
+                                                coilProvider.removePrimaryCoil();
+                                                SnackbarUtil.showInfoSnackBar(context: context, text: "Primary coil deleted");
+                                              },
+                                            ).catchError(
+                                              (err) {
+                                                SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error while deleting primary!");
+                                                return;
+                                              },
+                                            );
                                           }
                                         },
                                       ),
@@ -502,7 +506,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                       } else {}
                     }
 
-                    navigateToPrimaryCoilScreen();
+                    navigateToPrimaryCoilScreen(ComponentType.helicalCoil, true);
                   },
                 ),
               ],
@@ -591,19 +595,40 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
     );
   }
 
-  void navigateToPrimaryCoilScreen() async {
-    final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
-      context,
-      HelicalCoilCalculatorScreen.id,
-      arguments: HelicalCoilArgs(editing: true),
-    )) as HelicalCoil;
-
-    if (helicalCoil == null) {
-      return;
-    }
+  void navigateToPrimaryCoilScreen(ComponentType type, bool addingComponent) async {
+    //TODO Add support for flat coil also
 
     final coilProvider = Provider.of<CoilProvider>(context, listen: false);
 
+    // User wants to add coil
+    if (addingComponent) {
+      final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+        context,
+        HelicalCoilCalculatorScreen.id,
+        arguments: HelicalCoilArgs(editing: true),
+      )) as HelicalCoil;
+
+      if (helicalCoil == null) {
+        return;
+      }
+
+      insertPrimaryCoil(helicalCoil, coilProvider);
+    } else {
+      final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+        context,
+        HelicalCoilCalculatorScreen.id,
+        arguments: HelicalCoilArgs(editing: true, coil: coilProvider.coil.primaryCoil),
+      )) as HelicalCoil;
+
+      if (helicalCoil == null) {
+        return;
+      }
+
+      updatePrimaryCoil(helicalCoil, coilProvider);
+    }
+  }
+
+  void updatePrimaryCoil(HelicalCoil helicalCoil, CoilProvider provider) {
     final primaryCoil = PrimaryCoil(
       coilType: ComponentType.helicalCoil.index,
       turns: helicalCoil.turns,
@@ -613,8 +638,22 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
       inductance: helicalCoil.inductance,
     );
 
-    coilProvider.setPrimaryCoil(primaryCoil);
-    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(coilProvider.coil);
+    provider.setPrimaryCoil(primaryCoil);
+    Provider.of<DriftCoilDao>(context, listen: false).updatePrimaryCoil(provider.coil);
+  }
+
+  void insertPrimaryCoil(HelicalCoil helicalCoil, CoilProvider provider) {
+    final primaryCoil = PrimaryCoil(
+      coilType: ComponentType.helicalCoil.index,
+      turns: helicalCoil.turns,
+      wireSpacing: helicalCoil.wireSpacing,
+      wireDiameter: helicalCoil.wireDiameter,
+      coilDiameter: helicalCoil.coilDiameter,
+      inductance: helicalCoil.inductance,
+    );
+
+    provider.setPrimaryCoil(primaryCoil);
+    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(provider.coil);
   }
 }
 
