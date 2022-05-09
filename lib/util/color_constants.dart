@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 const lightestBlue = Color(0xffe1efff);
 const borderColor = Color(0x44595959);
 const whiteHeadline = Color(0xFFdbdbdb);
+const blackHeadline = Color(0xff5a5a5a);
+const whiteDisplay = Color(0xffBFBFBF);
 
 const teal = Color(0xff24a690);
 const purple = Color(0xffa350de);

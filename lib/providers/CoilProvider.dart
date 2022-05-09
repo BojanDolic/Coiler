@@ -57,6 +57,15 @@ class CoilProvider extends ChangeNotifier {
     return frequency.toStringAsFixed(4);
   }
 
+  String? displaySecondaryResonantFrequency() {
+    final freq = _coil.coilInfo.secondaryResonantFrequency;
+
+    if (freq == 0) {
+      return null;
+    }
+    return freq.toStringAsFixed(4);
+  }
+
   String? displayPrimaryCapacitance() {
     final capacitance = Converter().convertUnits(_coil.mmc?.capacitance, Units.DEFAULT, Units.NANO);
     return (capacitance > 0) ? capacitance.toStringAsFixed(3) + " nF" : null;

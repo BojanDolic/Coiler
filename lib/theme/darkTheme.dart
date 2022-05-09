@@ -29,14 +29,16 @@ final darkTheme = ThemeData(
   ),
   textTheme: TextTheme(
     headlineMedium: mediumHeadlineTextStyle.copyWith(color: ColorUtil.whiteHeadline),
+    headlineSmall: mediumHeadlineTextStyle.copyWith(color: ColorUtil.whiteHeadline, fontSize: 15),
     displaySmall: lightCategoryTextStyle.copyWith(
       color: Colors.white54,
       fontSize: 14,
     ),
-    displayMedium: normalTextStyleOpenSans14.copyWith(color: Colors.white54),
+    displayMedium: normalTextStyleOpenSans14.copyWith(color: ColorUtil.whiteDisplay),
+    displayLarge: normalTextStyleOpenSans14.copyWith(fontSize: 16, color: ColorUtil.whiteDisplay),
   ),
   listTileTheme: ListTileThemeData(
-    textColor: Colors.white,
+    textColor: ColorUtil.whiteHeadline,
     tileColor: Colors.grey.shade900,
     iconColor: Colors.white,
     shape: RoundedRectangleBorder(
@@ -57,5 +59,6 @@ final darkTheme = ThemeData(
     backgroundColor: darkThemeBackgroundColor,
     contentTextStyle: normalTextStyleOpenSans14.copyWith(color: Colors.white),
     shape: roundedBorder16,
+    titleTextStyle: mediumHeadlineTextStyle.copyWith(color: ColorUtil.whiteHeadline),
   ),
 );

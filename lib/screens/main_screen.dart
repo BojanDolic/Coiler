@@ -16,13 +16,16 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Column(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 12,
+                ),
+                Column(
                   children: [
                     Image.asset(
                       "assets/tcoil_icon.png",
@@ -39,76 +42,76 @@ class MainScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 26,
+                const SizedBox(
+                  height: 26,
+                ),
+                CategoryCard(
+                  title: "Calculation",
+                  description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
+                  image: Image.asset(
+                    "assets/math_icon.png",
+                    height: 42,
+                    width: 42,
+                    color: Colors.blue,
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, CalculatorsScreen.id);
+                  },
+                ),
+                CategoryCard(
+                  title: "Your coils",
+                  description: "Here you can find all of your tesla coils.",
+                  image: Image.asset(
+                    "assets/tesla_coil_outline_icon.png",
+                    height: 42,
+                    width: 42,
+                    color: Colors.orange,
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, CoilsListScreen.id);
+                  },
+                ),
+                CategoryCard(
+                  title: "Design guides",
+                  description: "Read about best practices when building coils and common mistakes to avoid.",
+                  image: Image.asset(
+                    "assets/design_icon.png",
+                    height: 42,
+                    width: 42,
+                    color: Colors.red,
+                  ),
+                  onTap: () {
+                    //TODO Navigate to...
+                  },
+                ),
+                CategoryCard(
+                  title: "Miscellaneous",
+                  description: "Other things you can find useful.",
+                  image: Image.asset(
+                    "assets/misc_icon.png",
+                    height: 42,
+                    width: 42,
+                    color: Colors.green,
+                  ),
+                  onTap: () {
+                    //TODO Navigate to...
+                  },
+                ),
+                CategoryCard(
+                  title: "Information",
+                  description: "Here you can find information about this app.",
+                  image: Image.asset(
+                    "assets/info_icon.png",
+                    height: 42,
+                    width: 42,
+                    color: Colors.purple,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(InformationScreen.id);
+                  },
+                ),
+              ],
             ),
-              CategoryCard(
-                title: "Calculation",
-                description: "A lot of different calculators for designing your tesla coils. Calculators like MMC, resonant frequency and so on.",
-                image: Image.asset(
-                  "assets/math_icon.png",
-                  height: 42,
-                  width: 42,
-                  color: Colors.blue,
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, CalculatorsScreen.id);
-                },
-              ),
-              CategoryCard(
-                title: "Your coils",
-                description: "Here you can find all of your tesla coils.",
-                image: Image.asset(
-                  "assets/tesla_coil_outline_icon.png",
-                  height: 42,
-                  width: 42,
-                  color: Colors.orange,
-                ),
-                onTap: () {
-                  Navigator.pushNamed(context, CoilsListScreen.id);
-                },
-            ),
-              CategoryCard(
-                title: "Design guides",
-                description: "Read about best practices when building coils and common mistakes to avoid.",
-                image: Image.asset(
-                  "assets/design_icon.png",
-                  height: 42,
-                  width: 42,
-                  color: Colors.red,
-                ),
-                onTap: () {
-                  //TODO Navigate to...
-                },
-              ),
-              CategoryCard(
-                title: "Miscellaneous",
-                description: "Other things you can find useful.",
-                image: Image.asset(
-                  "assets/misc_icon.png",
-                  height: 42,
-                  width: 42,
-                  color: Colors.green,
-                ),
-                onTap: () {
-                  //TODO Navigate to...
-                },
-              ),
-              CategoryCard(
-                title: "Information",
-                description: "Here you can find information about this app.",
-                image: Image.asset(
-                  "assets/info_icon.png",
-                  height: 42,
-                  width: 42,
-                  color: Colors.purple,
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed(InformationScreen.id);
-                },
-              ),
-            ],
           ),
         ),
       ),
@@ -117,7 +120,6 @@ class MainScreen extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-
   const CategoryCard({
     Key? key,
     required this.image,
