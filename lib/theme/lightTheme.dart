@@ -1,3 +1,4 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/ui_constants.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,13 @@ final lightTheme = ThemeData(
   ),
   textTheme: TextTheme(
     headlineMedium: mediumHeadlineTextStyle,
+    headlineSmall: mediumHeadlineTextStyle.copyWith(fontSize: 15, color: ColorUtil.blackHeadline),
     displaySmall: lightCategoryTextStyle.copyWith(
       color: Colors.black54,
       fontSize: 14,
     ),
     displayMedium: normalTextStyleOpenSans14,
+    displayLarge: normalTextStyleOpenSans14.copyWith(fontSize: 16),
   ),
   snackBarTheme: const SnackBarThemeData(
     backgroundColor: Color(0xFF2e2e2e),

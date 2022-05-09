@@ -66,6 +66,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final coilProvider = Provider.of<CoilProvider>(context, listen: true);
+    final theme = Theme.of(context);
 
     coilDescController.text = coilProvider.coil.coilInfo.coilDesc; //= coil.coilDesc;
     return WillPopScope(
@@ -73,7 +74,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
         return await onWillPopScreen(context, isEditingInfo);
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFf9fcff),
+        backgroundColor: theme.backgroundColor,
         body: SafeArea(
           child: CustomScrollView(
             controller: scrollController,
@@ -112,13 +113,13 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                           },
                           icon: const Icon(Icons.check)),
                 ],
-                backgroundColor: const Color(0xFFf9fcff),
+                backgroundColor: theme.backgroundColor,
                 flexibleSpace: FlexibleSpaceBar(
                   expandedTitleScale: 2,
                   title: Text(
                     Provider.of<CoilProvider>(context, listen: false).coil.coilInfo.coilName,
                     maxLines: 1,
-                    style: boldCategoryTextStyle.copyWith(color: Colors.black87),
+                    style: theme.textTheme.headlineMedium,
                   ),
                   background: Padding(
                     padding: const EdgeInsets.only(
@@ -147,10 +148,10 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   "Project description:",
                                   textAlign: TextAlign.start,
-                                  style: normalTextStyleOpenSans14,
+                                  style: theme.textTheme.displayMedium,
                                 ),
                                 const SizedBox(
                                   height: 6,
@@ -163,8 +164,9 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                   autocorrect: false,
                                   maxLines: null,
                                   maxLength: isEditingInfo ? 130 : null,
-                                  style: normalTextStyleOpenSans14,
+                                  style: theme.textTheme.displayMedium,
                                   decoration: InputDecoration(
+                                    hintStyle: theme.textTheme.displayMedium,
                                     hintText: (coilDescController.text.isEmpty && !isEditingInfo)
                                         ? "Project description not provided"
                                         : (coilDescController.text.isNotEmpty)
@@ -187,9 +189,9 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             "Coil specifications:",
-                            style: boldCategoryTextStyle,
+                            style: theme.textTheme.displayLarge,
                           ),
                           const SizedBox(
                             height: 9,
@@ -198,9 +200,9 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Text(
+                                Text(
                                   "Primary components:",
-                                  style: boldCategoryTextStyle,
+                                  style: theme.textTheme.headlineSmall,
                                 ),
                                 const SizedBox(
                                   height: 12,
@@ -214,11 +216,18 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                       width: 42,
                                       height: 42,
                                     ),
-                                    title: const Text("Primary frequency"),
+                                    title: Text(
+                                      "Primary frequency",
+                                      style: theme.textTheme.headlineSmall,
+                                    ),
                                     subtitle: Text(
-                                      coilProvider.displayPrimaryResonantFrequency() ?? "Missing primary components",
+                                      coilProvider.displayPrimaryResonantFrequency() ?? "Missing components",
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.headlineSmall?.copyWith(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                     trailing: IconButton(
                                       onPressed: () async {},
@@ -341,9 +350,9 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Text(
+                                Text(
                                   "Secondary components:",
-                                  style: boldCategoryTextStyle,
+                                  style: theme.textTheme.headlineSmall,
                                 ),
                                 const SizedBox(
                                   height: 12,
@@ -355,9 +364,12 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                     width: 42,
                                     height: 42,
                                   ),
-                                  title: const Text("Secondary frequency"),
-                                  subtitle: const Text(
-                                    "Missing components!",
+                                  title: Text(
+                                    "Secondary frequency",
+                                    style: theme.textTheme.headlineSmall,
+                                  ),
+                                  subtitle: Text(
+                                    coilProvider.displaySecondaryResonantFrequency() ?? "Missing components!",
                                     maxLines: 2,
                                   ),
                                   trailing: IconButton(
@@ -626,6 +638,7 @@ class CoilComponent extends StatelessWidget implements DialogCallbacks {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BorderContainer(
       padding: EdgeInsets.zero,
       child: ListTile(
@@ -640,11 +653,11 @@ class CoilComponent extends StatelessWidget implements DialogCallbacks {
         ),
         title: Text(
           title,
-          style: normalTextStyleOpenSans14,
+          style: theme.textTheme.headlineSmall,
         ),
         subtitle: Text(
           value,
-          style: lightCategoryTextStyle,
+          style: theme.textTheme.displaySmall,
         ),
         onTap: () {
           displayComponentActionDialog(context, this);
