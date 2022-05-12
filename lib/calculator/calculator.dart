@@ -54,8 +54,7 @@ class Calculator {
    *
    * Function returns inductance of the coil in microhenrys
    */
-  double calculateSpiralCoilInductance(int turns, double diameter,
-      double wireDiameter, double turnSpacing, Units units) {
+  double calculateSpiralCoilInductance(int turns, double diameter, double wireDiameter, double turnSpacing, Units units) {
     // If passed units are not in meters
     if (units != Units.DEFAULT) {
       diameter = converter.convertUnits(diameter, units, Units.DEFAULT);
@@ -64,14 +63,73 @@ class Calculator {
     }
 
     var radius = diameter / 2;
-    var radiusInches = radius / 25.4;
+    //var radiusInches = radius / 25.4;
 
     var coilHeight = turns * (turnSpacing + wireDiameter);
-    var coilHeightInches = coilHeight / 25.4;
+    //var coilHeightInches = coilHeight / 25.4;
 
-    var defaultInductance =
-        math.pow(radius * turns, 2) / (0.2286 * radius + 0.254 * coilHeight);
+    var defaultInductance = math.pow(radius * turns, 2) / (0.2286 * radius + 0.254 * coilHeight);
 
     return defaultInductance;
   }
+
+  /**
+   * Function used to calculate inductance of single-layer flat spiral round-wire coil
+   *
+   * [turns] turns of the coil
+   * [innerDiameter] inner diameter of the coil.
+   * [wireDiameter] diameter of the wire used for winding the coil.
+   * [turnSpacing] spacing between two adjacent turns of the wire.
+   *
+   * Function uses Harold A. Wheeler formula:
+   *
+   * **L = (R * N)^2 / (8 * R + 11 * W)** where:
+   * - L is the inductance in microhenrys
+   * - R is the average radius of the coil in inches
+   * - N is the number of turns the coil has.
+   * - W is the width of the coil measured in inches | ([turns] * ([wireDiameter] + [turnSpacing]))
+   *
+   *
+   * If values passed are not in meters, which is determined by parameter [units],
+   * then function converts all values to default value of meter
+   *
+   * Function returns inductance of the coil in henries
+   */
+
+  double calculateFlatCoilInductance(int turns, double innerDiameter, double wireDiameter, double turnSpacing, Units units) {
+    // If passed units are not in meters
+    if (units != Units.DEFAULT) {
+      innerDiameter = converter.convertToDefault(innerDiameter, units);
+      wireDiameter = converter.convertToDefault(wireDiameter, units);
+      turnSpacing = converter.convertToDefault(turnSpacing, units);
+    }
+
+    var wireDiameterInches = wireDiameter * 39.37;
+    var innerDiameterInches = innerDiameter * 39.37;
+    var turnSpacingInches = turnSpacing * 39.37;
+
+    var coilWidth = turns * (wireDiameterInches + turnSpacingInches);
+
+    var innerRadius = innerDiameterInches / 2;
+
+    var halfWidth = coilWidth / 2;
+
+    var radius = halfWidth + innerRadius;
+
+    var inductance = math.pow(radius * turns, 2) / (8 * radius + 11 * coilWidth);
+
+    // Convert to default because formula used above returns inductance in microhenries
+    return converter.convertToDefault(inductance, Units.MICRO);
+  }
+
+/*var coilWidth = turns * (wireDiameterInches + turnSpacingInches);
+
+    var innerRadius = innerDiameterInches / 2;
+    var avgRadius = innerRadius + coilWidth / 2;
+
+    var inductance = (math.pow(turns * avgRadius, 2)) / (30 * avgRadius - 11 * innerDiameterInches);
+
+    // Convert to default because formula used above returns inductance in microhenries
+    return converter.convertToDefault(inductance, Units.MICRO);*/
+
 }

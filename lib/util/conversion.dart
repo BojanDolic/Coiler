@@ -40,6 +40,16 @@ class Converter {
     return result;
   }
 
+  double convertDefaultToInches(dynamic value) {
+    double result = 0.0;
+    try {
+      result = value * 39.37;
+    } catch (e) {
+      print(e);
+    }
+    return result;
+  }
+
   double convertFromDefaultToMicro(dynamic value) => convertUnits(value, Units.DEFAULT, Units.MICRO);
 
   double convertToDefault(dynamic value, Units from) => convertUnits(value, from, Units.DEFAULT);

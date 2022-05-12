@@ -2,9 +2,11 @@ import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/database/drift_coil_database.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
+import 'package:coiler_app/providers/FlatCoilProvider.dart';
 import 'package:coiler_app/providers/FrequencyProvider.dart';
 import 'package:coiler_app/providers/HelicalCalculatorProvider.dart';
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
+import 'package:coiler_app/screens/calculators/flat_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
 import 'package:coiler_app/screens/calculators_screen.dart';
@@ -99,6 +101,15 @@ class MyApp extends StatelessWidget {
               ),
             );
           });
+        } else if (settings.name == FlatCoilScreen.id) {
+          return MaterialPageRoute(
+            builder: (context) {
+              return ChangeNotifierProvider<FlatCoilProvider>(
+                create: (context) => FlatCoilProvider(),
+                child: FlatCoilScreen(),
+              );
+            },
+          );
         }
       },
     );
