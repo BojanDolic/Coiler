@@ -1,3 +1,5 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
+import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -29,6 +31,8 @@ class InputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = context.isDarkTheme();
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: (value) => onTextChanged(value),
@@ -38,6 +42,7 @@ class InputField extends StatelessWidget {
       maxLines: 1,
       maxLength: maxLength,
       inputFormatters: inputFormatter,
+      style: theme.textTheme.displayMedium,
       decoration: InputDecoration(
         suffixIcon: Padding(
           padding: const EdgeInsets.only(
@@ -49,7 +54,7 @@ class InputField extends StatelessWidget {
               horizontal: 9,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xffe1efff),
+              color: (isDark) ? Colors.grey.shade800 : ColorUtil.lightestBlue,
               borderRadius: BorderRadius.circular(9),
             ),
             child: Align(
@@ -59,10 +64,7 @@ class InputField extends StatelessWidget {
                 unitText,
                 textAlign: TextAlign.center,
                 maxLines: 1,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "OpenSans",
-                ),
+                style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ),
