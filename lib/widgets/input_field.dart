@@ -1,3 +1,5 @@
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
+import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -29,54 +31,49 @@ class InputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 12,
-      ),
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        onChanged: (value) => onTextChanged(value),
-        validator: (text) => validator(text),
-        controller: controller,
-        keyboardType: inputType,
-        maxLines: 1,
-        maxLength: maxLength,
-        inputFormatters: inputFormatter,
-        decoration: InputDecoration(
-          suffixIcon: Padding(
-            padding: const EdgeInsets.only(
-              right: 9,
+    final theme = Theme.of(context);
+    final isDark = context.isDarkTheme();
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      onChanged: (value) => onTextChanged(value),
+      validator: (text) => validator(text),
+      controller: controller,
+      keyboardType: inputType,
+      maxLines: 1,
+      maxLength: maxLength,
+      inputFormatters: inputFormatter,
+      style: theme.textTheme.displayMedium,
+      decoration: InputDecoration(
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(
+            right: 9,
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 3,
+              horizontal: 9,
             ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 3,
-                horizontal: 9,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xffe1efff),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Align(
-                alignment: Alignment.center,
-                widthFactor: 1,
-                child: Text(
-                  unitText,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "OpenSans",
-                  ),
-                ),
+            decoration: BoxDecoration(
+              color: (isDark) ? Colors.grey.shade800 : ColorUtil.lightestBlue,
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Align(
+              alignment: Alignment.center,
+              widthFactor: 1,
+              child: Text(
+                unitText,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          hintText: hintText,
-          labelText: labelText,
-          errorText: errorText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(9),
-          ),
+        ),
+        hintText: hintText,
+        labelText: labelText,
+        errorText: errorText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(9),
         ),
       ),
     );

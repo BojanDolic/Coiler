@@ -1,4 +1,5 @@
 import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
+import 'package:coiler_app/screens/calculators/flat_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/resonant_freq_screen.dart';
 import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
@@ -78,7 +79,7 @@ class CalculatorsScreen extends StatelessWidget {
                   height: 32,
                 ),
                 onTap: () {
-                  //TODO add navigation to flat coil calculation
+                  Navigator.pushNamed(context, FlatCoilScreen.id);
                 },
               ),
               CalculatorItem(
