@@ -67,8 +67,9 @@ class DialogUtil {
                   height: 12,
                 ),
                 Image.asset(
-                  "assets/formulas/helical_coil_formula_200.png",
+                  "assets/formulas/flat_coil_inductance_formula.png",
                   color: theme.dialogTheme.contentTextStyle?.color,
+                  scale: 1,
                 ),
                 const SizedBox(
                   height: 24,
@@ -76,8 +77,7 @@ class DialogUtil {
                 Text(
                   "Formulas used in this calculator are formulas derived by Harold A. Wheeler.\n"
                   "He proposed formula shown above to be used for determining inductance "
-                  "of finite-length solenoid made of round wire."
-                  "\nThe values entered must be in inches."
+                  "of flat spiral coil made of round wire."
                   "\nResultant inductance is in microhenries (μH)"
                   "\n\nReference: Harold A. Wheeler, \"Simple Inductance Formulas for Radio Coils,\" Proceedings of the I.R.E., October 1928, pp. 1398-1400",
                   style: theme.dialogTheme.contentTextStyle,
