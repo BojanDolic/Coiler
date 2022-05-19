@@ -1,8 +1,14 @@
 import 'package:coiler_app/dialogs/DialogUtil.dart';
+import 'package:coiler_app/entities/FlatCoil.dart';
+import 'package:coiler_app/entities/args/FlatCoilArgs.dart';
 import 'package:coiler_app/providers/FlatCoilProvider.dart';
+import 'package:coiler_app/util/SnackbarUtil.dart';
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:coiler_app/util/list_constants.dart';
+import 'package:coiler_app/util/ui_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/dropdown_widget.dart';
 import 'package:coiler_app/widgets/input_field.dart';
@@ -12,7 +18,12 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class FlatCoilScreen extends StatefulWidget {
-  const FlatCoilScreen({Key? key}) : super(key: key);
+  const FlatCoilScreen({
+    Key? key,
+    this.args,
+  }) : super(key: key);
+
+  final FlatCoilArgs? args;
 
   static const String id = "flat_coil_screen";
 
@@ -26,10 +37,60 @@ class _FlatCoilScreenState extends State<FlatCoilScreen> {
   TextEditingController turnSpacingTextController = TextEditingController();
   TextEditingController turnsTextController = TextEditingController();
 
+  final converter = Converter();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      var args = widget.args;
+
+      if (args != null) {
+        var editing = args.editing;
+
+        provider.editing = true;
+
+        if (editing) {
+          final coil = args.coil;
+          if (coil != null) {
+            loadCoilInfo(coil);
+          }
+        }
+      }
+    });
+    super.initState();
+  }
+
+  void loadCoilInfo(FlatCoil coil) {
+    final _provider = Provider.of<FlatCoilProvider>(context, listen: false);
+
+    provider.editing = true;
+
+    var _inductance = converter.convertUnits(coil.inductance, Units.DEFAULT, _provider.inductanceUnit);
+    var _turnSpacing = converter.convertUnits(coil.turnSpacing, Units.DEFAULT, _provider.wireSpacingUnit);
+    var _coilDiameter = converter.convertUnits(coil.innerDiameter, Units.DEFAULT, _provider.innerDiameterUnit);
+    var _wireDiameter = converter.convertUnits(coil.wireDiameter, Units.DEFAULT, _provider.wireDiameterUnit);
+
+    _provider.setTurns(coil.turns);
+    turnsTextController.text = _provider.turns.value.toString();
+
+    _provider.setWireDiameter(_wireDiameter);
+    wireDiameterTextController.text = _provider.wireDiameter.value.toString();
+
+    _provider.setInnerDiameter(_coilDiameter);
+    innerDiameterTextController.text = _provider.innerDiameter.value.toString();
+
+    _provider.setTurnSpacing(_turnSpacing);
+    turnSpacingTextController.text = _provider.turnSpacing.value.toString();
+
+    _provider.inductance = _inductance;
+  }
+
+  late FlatCoilProvider provider;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final provider = Provider.of<FlatCoilProvider>(context);
+    provider = Provider.of<FlatCoilProvider>(context);
     return Scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: AppBar(
@@ -78,7 +139,7 @@ class _FlatCoilScreenState extends State<FlatCoilScreen> {
                     children: [
                       Flexible(
                         child: Text(
-                          "Inductance: ${provider.inductance}",
+                          "Inductance: ${provider.inductance.toStringAsFixed(7)}",
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.displayMedium,
@@ -171,12 +232,42 @@ class _FlatCoilScreenState extends State<FlatCoilScreen> {
                   unitText: "No",
                   inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                 ),
+                Visibility(
+                  visible: provider.editing,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                    ),
+                    child: MaterialButton(
+                      elevation: 3,
+                      focusElevation: 0,
+                      highlightElevation: 0,
+                      splashColor: Colors.lightBlueAccent,
+                      color: ColorUtil.lightestBlue,
+                      shape: roundedBorder16,
+                      onPressed: () {
+                        saveCoil();
+                      },
+                      child: const Text("SAVE COIL INFO"),
+                    ),
+                  ),
+                )
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  void saveCoil() {
+    if (!provider.validate()) {
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Check your input fields!");
+      return;
+    }
+
+    final coil = provider.getCoil();
+    Navigator.pop(context, coil);
   }
 }
 

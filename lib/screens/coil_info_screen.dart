@@ -2,9 +2,12 @@ import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/ComponentData.dart';
+import 'package:coiler_app/entities/FlatCoil.dart';
 import 'package:coiler_app/entities/HelicalCoil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/entities/args/FlatCoilArgs.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
+import 'package:coiler_app/screens/calculators/flat_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/util/DialogCallback.dart';
 import 'package:coiler_app/util/SnackbarUtil.dart';
@@ -12,7 +15,6 @@ import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/extension_functions.dart';
 import 'package:coiler_app/util/list_constants.dart';
-import 'package:coiler_app/util/util_functions.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/component_info_dialog.dart';
 import 'package:flutter/material.dart';
@@ -317,10 +319,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               return;
                                             }
 
-                                            navigateToPrimaryCoilScreen(ComponentType.helicalCoil, false);
-
-                                            //TODO navigate to edit screen
-
+                                            navigateToPrimaryCoilScreen(ComponentType.values[coilProvider.coil.primaryCoil?.coilType ?? 1], false);
                                           } else if (action == DialogAction.onDelete) {
                                             if (!coilProvider.hasPrimaryCoil()) {
                                               SnackbarUtil.showErrorSnackBar(context: context, errorText: "Primary coil is not added");
@@ -487,7 +486,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                   color: Colors.orangeAccent,
                   onTap: () {
                     Navigator.pop(context);
-                    SnackbarUtil.showInfoSnackBar(context: context, text: "Currently unavailable");
+                    navigateToPrimaryCoilScreen(ComponentType.flatCoil, true);
                   },
                 ),
                 const SizedBox(
@@ -596,64 +595,86 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
   }
 
   void navigateToPrimaryCoilScreen(ComponentType type, bool addingComponent) async {
-    //TODO Add support for flat coil also
-
     final coilProvider = Provider.of<CoilProvider>(context, listen: false);
 
     // User wants to add coil
     if (addingComponent) {
-      final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
-        context,
-        HelicalCoilCalculatorScreen.id,
-        arguments: HelicalCoilArgs(editing: true),
-      )) as HelicalCoil;
+      if (type == ComponentType.helicalCoil) {
+        final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+          context,
+          HelicalCoilCalculatorScreen.id,
+          arguments: HelicalCoilArgs(editing: true),
+        )) as HelicalCoil;
 
-      if (helicalCoil == null) {
-        return;
+        if (helicalCoil == null) {
+          return;
+        }
+        insertPrimaryCoil(helicalCoil.toPrimaryCoil(), coilProvider);
+      } else if (type == ComponentType.flatCoil) {
+        final FlatCoil? flatCoil = (await Navigator.pushNamed(
+          context,
+          FlatCoilScreen.id,
+          arguments: FlatCoilArgs(editing: true),
+        )) as FlatCoil;
+
+        // No data is returned
+        if (flatCoil == null) {
+          return;
+        }
+        insertPrimaryCoil(flatCoil.toPrimaryCoil(), coilProvider);
       }
-
-      insertPrimaryCoil(helicalCoil, coilProvider);
     } else {
-      final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
-        context,
-        HelicalCoilCalculatorScreen.id,
-        arguments: HelicalCoilArgs(editing: true, coil: coilProvider.coil.primaryCoil),
-      )) as HelicalCoil;
+      if (type == ComponentType.helicalCoil) {
+        final HelicalCoil? helicalCoil = (await Navigator.pushNamed(
+          context,
+          HelicalCoilCalculatorScreen.id,
+          arguments: HelicalCoilArgs(
+            editing: true,
+            coil: coilProvider.coil.primaryCoil?.toHelicalCoil(),
+          ),
+        )) as HelicalCoil;
 
-      if (helicalCoil == null) {
-        return;
+        if (helicalCoil == null) {
+          return;
+        }
+
+        updatePrimaryCoil(helicalCoil.toPrimaryCoil(), coilProvider);
+      } else if (type == ComponentType.flatCoil) {
+        final FlatCoil? flatCoil = (await Navigator.pushNamed(
+          context,
+          FlatCoilScreen.id,
+          arguments: FlatCoilArgs(
+            editing: true,
+            coil: coilProvider.coil.primaryCoil?.toFlatCoil(),
+          ),
+        )) as FlatCoil;
+
+        if (flatCoil == null) {
+          return;
+        }
+
+        updatePrimaryCoil(flatCoil.toPrimaryCoil(), coilProvider);
       }
-
-      updatePrimaryCoil(helicalCoil, coilProvider);
     }
   }
 
-  void updatePrimaryCoil(HelicalCoil helicalCoil, CoilProvider provider) {
-    final primaryCoil = PrimaryCoil(
-      coilType: ComponentType.helicalCoil.index,
-      turns: helicalCoil.turns,
-      wireSpacing: helicalCoil.wireSpacing,
-      wireDiameter: helicalCoil.wireDiameter,
-      coilDiameter: helicalCoil.coilDiameter,
-      inductance: helicalCoil.inductance,
-    );
-
+  void updatePrimaryCoil(PrimaryCoil primaryCoil, CoilProvider provider) {
     provider.setPrimaryCoil(primaryCoil);
-    Provider.of<DriftCoilDao>(context, listen: false).updatePrimaryCoil(provider.coil);
+    Provider.of<DriftCoilDao>(context, listen: false).updatePrimaryCoil(provider.coil).then((value) {
+      SnackbarUtil.showInfoSnackBar(context: context, text: "Coil updated successfully");
+    }).catchError((err) {
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: err.toString());
+    });
   }
 
-  void insertPrimaryCoil(HelicalCoil helicalCoil, CoilProvider provider) {
-    final primaryCoil = PrimaryCoil(
-      coilType: ComponentType.helicalCoil.index,
-      turns: helicalCoil.turns,
-      wireSpacing: helicalCoil.wireSpacing,
-      wireDiameter: helicalCoil.wireDiameter,
-      coilDiameter: helicalCoil.coilDiameter,
-      inductance: helicalCoil.inductance,
-    );
-
-    provider.setPrimaryCoil(primaryCoil);
-    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(provider.coil);
+  void insertPrimaryCoil(PrimaryCoil coil, CoilProvider provider) {
+    try {
+      provider.setPrimaryCoil(coil);
+      Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(provider.coil);
+    } catch (e) {
+      print(e);
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error inserting primary coil!");
+    }
   }
 }
 
@@ -1027,7 +1048,7 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
 
           final inductance = helicalCoil.inductance.toStringWithPrefix(3);
           final wireDiameter = helicalCoil.wireDiameter.toStringWithPrefix();
-          final wireSpacing = helicalCoil.wireSpacing.toStringWithPrefix();
+          final wireSpacing = helicalCoil.turnSpacing.toStringWithPrefix();
 
           components = [
             ComponentData(
@@ -1052,10 +1073,12 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
             ),
           ];
         } else {
-          final helicalCoil = coil.secondaryCoil!;
+          //final helicalCoil = coil.secondaryCoil!;
 
-          final coilHeight = Converter().convertFromDefaultToMili(helicalCoil.getCoilHeight());
-          final coilWidth = Converter().convertFromDefaultToMili(helicalCoil.coilDiameter);
+          //final coilHeight = Converter().convertFromDefaultToMili(helicalCoil.get);
+          //final coilWidth = Converter().convertFromDefaultToMili(helicalCoil.coilDiameter);
+
+          //TODO Change to secondary
 
           components = [
             ComponentData(
@@ -1073,11 +1096,11 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
               value: coil.primaryCoil?.turns.toString() ?? "No data",
               imageAssetPath: "assets/icons/quantity_icon.png",
             ),
-            ComponentData(
+            /*ComponentData(
               name: "H/W ratio",
               value: Util.getHeightToWidthRatio(coilHeight, coilWidth).toStringAsFixed(1),
               imageAssetPath: "assets/icons/quantity_icon.png",
-            ),
+            ),*/
           ];
         }
 
