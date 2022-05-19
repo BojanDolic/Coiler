@@ -74,7 +74,7 @@ class HelicalProvider extends ChangeNotifier {
       inductance: inductance,
       coilDiameter: coilDiamTemp,
       wireDiameter: wireDiamTemp,
-      wireSpacing: turnSpacingTemp,
+      turnSpacing: turnSpacingTemp,
     );
   }
 

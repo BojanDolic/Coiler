@@ -26,6 +26,7 @@ class CoilProvider extends ChangeNotifier {
   }
 
   void setPrimaryCoil(PrimaryCoil primaryCoil) {
+    primaryCoil.id = _coil.primaryCoil?.id; // Setting id
     _coil.primaryCoil = primaryCoil;
     notifyListeners();
   }

@@ -46,7 +46,7 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
           turns: fullCoil.primaryCoil?.turns ?? 0,
           inductance: fullCoil.primaryCoil?.inductance ?? 0.0,
           wireDiameter: fullCoil.primaryCoil?.wireDiameter ?? 0.0,
-          wireSpacing: fullCoil.primaryCoil?.wireSpacing ?? 0.0,
+          wireSpacing: fullCoil.primaryCoil?.turnSpacing ?? 0.0,
           coilDiameter: fullCoil.primaryCoil?.coilDiameter ?? 0.0,
           innerDiameter: fullCoil.primaryCoil?.innerDiameter ?? 0.0,
         ),
@@ -55,9 +55,10 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
   }
 
   Future updatePrimaryCoil(Coil coil) {
+    print("COIL UPDATE:\n${coil.primaryCoil.toString()}");
     return (update(coils)
           ..where(
-            (tbl) => tbl.id.equals(coil.id),
+            (tbl) => tbl.primary_id.equals(coil.id),
           ))
         .write(
       CoilForm(
@@ -65,7 +66,7 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
         turns: coil.primaryCoil?.turns ?? 0,
         inductance: coil.primaryCoil?.inductance ?? 0.0,
         wireDiameter: coil.primaryCoil?.wireDiameter ?? 0.0,
-        wireSpacing: coil.primaryCoil?.wireSpacing ?? 0.0,
+        wireSpacing: coil.primaryCoil?.turnSpacing ?? 0.0,
         coilDiameter: coil.primaryCoil?.coilDiameter ?? 0.0,
         innerDiameter: coil.primaryCoil?.innerDiameter ?? 0.0,
       ),
@@ -141,7 +142,7 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
                   inductance: primary.inductance,
                   turns: primary.turns,
                   wireDiameter: primary.wireDiameter,
-                  wireSpacing: primary.wireSpacing,
+                  turnSpacing: primary.wireSpacing,
                   coilDiameter: primary.coilDiameter,
                   innerDiameter: primary.innerDiameter,
                 );

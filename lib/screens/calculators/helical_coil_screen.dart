@@ -46,7 +46,7 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
     provider.editing = true;
 
     var _inductance = converter.convertUnits(coil.inductance, Units.DEFAULT, _provider.inductanceUnit);
-    var _turnSpacing = converter.convertUnits(coil.wireSpacing, Units.DEFAULT, _provider.turnSpacingUnit);
+    var _turnSpacing = converter.convertUnits(coil.turnSpacing, Units.DEFAULT, _provider.turnSpacingUnit);
     var _coilDiameter = converter.convertUnits(coil.coilDiameter, Units.DEFAULT, _provider.coilDiameterUnit);
     var _wireDiameter = converter.convertUnits(coil.wireDiameter, Units.DEFAULT, _provider.wireDiameterUnit);
 
@@ -279,6 +279,7 @@ class _HelicalCoilCalculatorScreenState extends State<HelicalCoilCalculatorScree
   void saveCoil() {
     if (!provider.validate) {
       SnackbarUtil.showErrorSnackBar(context: context, errorText: "Check your input fields!");
+      return;
     }
 
     final coil = provider.saveCoil();

@@ -1,4 +1,5 @@
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/entities/FlatCoil.dart';
 import 'package:coiler_app/entities/Validation.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
@@ -13,9 +14,9 @@ class FlatCoilProvider extends ChangeNotifier {
   InputValidation _turnSpacing = InputValidation(value: null, error: null);
   InputValidation _turns = InputValidation(value: null, error: null);
 
-  double _inductance = 0.0;
+  bool editing = false;
 
-  String get inductance => _inductance.toStringAsFixed(7);
+  double inductance = 0.0;
 
   InputValidation get innerDiameter => _innerDiameter;
   InputValidation get wireDiameter => _wireDiameter;
@@ -51,7 +52,7 @@ class FlatCoilProvider extends ChangeNotifier {
 
   void _calculateResult(double innerDiameter, double wireDiameter, double turnSpacing, int turns) {
     final value = calculator.calculateFlatCoilInductance(turns, innerDiameter, wireDiameter, turnSpacing, Units.DEFAULT);
-    _inductance = converter.convertUnits(value, Units.DEFAULT, _inductanceUnit);
+    inductance = converter.convertUnits(value, Units.DEFAULT, _inductanceUnit);
   }
 
   void setInductanceUnit(Units unit) {
@@ -116,7 +117,43 @@ class FlatCoilProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  FlatCoil getCoil() {
+    //Convert to default units
+    final wireDiam = converter.convertToDefault(_wireDiameter.value, _wireDiameterUnit);
+    final coilInnerDiam = converter.convertToDefault(_innerDiameter.value, _innerDiameterUnit);
+    final turnSpacing = converter.convertToDefault(_turnSpacing.value, _turnSpacingUnit);
+    final inductanceTemp = converter.convertToDefault(inductance, inductanceUnit);
+
+    return FlatCoil(
+      turns: _turns.value,
+      inductance: inductanceTemp,
+      innerDiameter: coilInnerDiam,
+      turnSpacing: turnSpacing,
+      wireDiameter: wireDiam,
+    );
+  }
+
   bool validate() {
     return (_innerDiameter.error == null && _wireDiameter.error == null && _turnSpacing.error == null && _turns.error == null);
+  }
+
+  void setTurns(int turns) {
+    _turns.value = turns;
+    notifyListeners();
+  }
+
+  void setWireDiameter(double wireDiameter) {
+    _wireDiameter.value = wireDiameter;
+    notifyListeners();
+  }
+
+  void setInnerDiameter(double innerDiameter) {
+    _innerDiameter.value = innerDiameter;
+    notifyListeners();
+  }
+
+  void setTurnSpacing(double spacing) {
+    _turnSpacing.value = spacing;
+    notifyListeners();
   }
 }
