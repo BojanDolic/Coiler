@@ -28,7 +28,32 @@ class Util {
     return height / width;
   }
 
-  /*static bool hasSecondary(FullCoil coil) {
-    return coil
-  }*/
+  /// Function used to return component name based on [type] passed
+  ///
+  /// **[type]** - Type of the component
+  static String getComponentName(ComponentType type) {
+    String name = "";
+
+    switch (type) {
+      case ComponentType.capacitor:
+        name = "MMC";
+        break;
+      case ComponentType.helicalCoil:
+        name = "Helical coil";
+        break;
+      case ComponentType.flatCoil:
+        name = "Flat coil";
+        break;
+      case ComponentType.ringToroidTopload:
+        name = "Ring topload";
+        break;
+      case ComponentType.fullToroidTopload:
+        name = "Toroid topload";
+        break;
+      case ComponentType.sphereTopload:
+        name = "Sphere topload";
+        break;
+    }
+    return name;
+  }
 }
