@@ -309,7 +309,12 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               );
                                               return;
                                             }
-                                            openInformationDialog(context, coilProvider.coil, ComponentType.helicalCoil, true);
+                                            openInformationDialog(
+                                              context,
+                                              coilProvider.coil,
+                                              ComponentType.values[coilProvider.coil.primaryCoil?.coilType ?? 1],
+                                              true,
+                                            );
                                           } else if (action == DialogAction.onEdit) {
                                             if (!coilProvider.hasPrimaryCoil()) {
                                               SnackbarUtil.showInfoSnackBar(
@@ -319,7 +324,10 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                               return;
                                             }
 
-                                            navigateToPrimaryCoilScreen(ComponentType.values[coilProvider.coil.primaryCoil?.coilType ?? 1], false);
+                                            navigateToPrimaryCoilScreen(
+                                              ComponentType.values[coilProvider.coil.primaryCoil?.coilType ?? 1],
+                                              false,
+                                            );
                                           } else if (action == DialogAction.onDelete) {
                                             if (!coilProvider.hasPrimaryCoil()) {
                                               SnackbarUtil.showErrorSnackBar(context: context, errorText: "Primary coil is not added");
@@ -1011,7 +1019,13 @@ void openInformationDialog(
           );
           break;
         case ComponentType.flatCoil:
-          // TODO: Handle this case.
+          dialog = ComponentInfoDialog(
+            componentName: "Flat coil",
+            sideText: isPrimary ? "Primary" : "Secondary",
+            assetImagePath: 'assets/flat_coil_icon.png',
+            assetColor: Colors.orangeAccent,
+            components: getComponentItems(coil, type, isPrimary),
+          );
           break;
         case ComponentType.ringToroidTopload:
           // TODO: Handle this case.
@@ -1107,7 +1121,34 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
         break;
       }
     case ComponentType.flatCoil:
-      // TODO: Handle this case.
+      final flatCoil = coil.primaryCoil!;
+
+      final inductance = flatCoil.inductance.toStringWithPrefix(3);
+      final wireDiameter = flatCoil.wireDiameter.toStringWithPrefix();
+      final wireSpacing = flatCoil.turnSpacing.toStringWithPrefix();
+
+      components = [
+        ComponentData(
+          name: "Inductance",
+          value: inductance.toHenry(), //Converter().convertToMicro(helicalCoil.inductance).toStringAsFixed(2) + " µH",
+          imageAssetPath: "assets/icons/inductance_icon.png",
+        ),
+        ComponentData(
+          name: "Wire diameter",
+          value: wireDiameter.toMeter(),
+          imageAssetPath: "assets/icons/diameter_icon.png",
+        ),
+        ComponentData(
+          name: "Wire spacing",
+          value: wireSpacing.toMeter(),
+          imageAssetPath: "assets/icons/spacing_icon.png",
+        ),
+        ComponentData(
+          name: "Turns",
+          value: flatCoil.turns.toString(),
+          imageAssetPath: "assets/icons/quantity_icon.png",
+        ),
+      ];
       break;
     case ComponentType.ringToroidTopload:
       // TODO: Handle this case.
