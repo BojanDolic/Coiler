@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 class ResonantFrequencyScreen extends StatefulWidget {
   const ResonantFrequencyScreen({Key? key}) : super(key: key);
 
-  static String id = "/calculators/resfreq";
+  static const String id = "/calculators/resfreq";
 
   @override
   _ResonantFrequencyScreenState createState() => _ResonantFrequencyScreenState();

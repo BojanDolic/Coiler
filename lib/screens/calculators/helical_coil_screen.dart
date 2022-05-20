@@ -20,7 +20,7 @@ import 'package:provider/provider.dart';
 class HelicalCoilCalculatorScreen extends StatefulWidget {
   const HelicalCoilCalculatorScreen({Key? key, this.args}) : super(key: key);
 
-  static String id = "/calculators/helical_coil";
+  static const String id = "/calculators/helical_coil";
   final HelicalCoilArgs? args;
 
   @override
