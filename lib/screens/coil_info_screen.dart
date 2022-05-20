@@ -21,11 +21,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CoilInfoScreen extends StatefulWidget {
-  const CoilInfoScreen({Key? key, required this.driftDao}) : super(key: key);
+  const CoilInfoScreen({
+    Key? key,
+  }) : super(key: key);
 
   static const String id = "/main/coils/coil_info";
-
-  final DriftCoilDao driftDao;
 
   @override
   State<CoilInfoScreen> createState() => _CoilInfoScreenState();
