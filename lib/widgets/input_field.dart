@@ -1,4 +1,3 @@
-import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,7 +31,6 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = context.isDarkTheme();
     return TextFormField(
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: (value) => onTextChanged(value),
@@ -54,7 +52,7 @@ class InputField extends StatelessWidget {
               horizontal: 9,
             ),
             decoration: BoxDecoration(
-              color: (isDark) ? Colors.grey.shade800 : ColorUtil.lightestBlue,
+              color: context.getDropDownColor(),
               borderRadius: BorderRadius.circular(9),
             ),
             child: Align(
@@ -72,7 +70,20 @@ class InputField extends StatelessWidget {
         hintText: hintText,
         labelText: labelText,
         errorText: errorText,
+        hintStyle: theme.inputDecorationTheme.labelStyle,
+        labelStyle: theme.inputDecorationTheme.labelStyle,
+        floatingLabelStyle: MaterialStateTextStyle.resolveWith((states) {
+          var color = theme.textTheme.displayMedium?.color;
+
+          if (states.contains(MaterialState.error)) {
+            color = Colors.red;
+          } else if (states.contains(MaterialState.focused)) {
+            color = theme.primaryColor;
+          }
+          return (theme.inputDecorationTheme.floatingLabelStyle?.copyWith(color: color))!;
+        }),
         border: OutlineInputBorder(
+          borderSide: BorderSide(color: theme.primaryColor),
           borderRadius: BorderRadius.circular(9),
         ),
       ),

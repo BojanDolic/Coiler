@@ -1,6 +1,7 @@
 import 'package:coiler_app/calculator/calculator.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
+import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/input_field.dart';
@@ -66,15 +67,15 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
 
   void convertUnits() {
     setState(() {
-      _finalCapacitance = Converter()
-          .convertUnits(_finalCapacitance, _capacitance, unitsToConvertTo);
+      _finalCapacitance = Converter().convertUnits(_finalCapacitance, _capacitance, unitsToConvertTo);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.canvasColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -84,20 +85,20 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  const BorderContainer(
+                  BorderContainer(
                     child: Text(
                       "MMC calculator can help you calculate your capacitor bank capacitance and voltage easily."
                       "\n\n Enter values below and result is calculated automatically.",
                       textAlign: TextAlign.center,
-                      style: normalTextStyleOpenSans14,
+                      style: theme.textTheme.displayMedium,
                     ),
-                    elevated: true,
+                    elevated: false,
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   BorderContainer(
-                    elevated: true,
+                    elevated: false,
                     child: Column(
                       children: [
                         Row(
@@ -105,7 +106,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                           children: [
                             Text(
                               "Final capacitance: $_finalCapacitance",
-                              style: biggerTextStyleOpenSans15,
+                              style: theme.textTheme.headlineSmall,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -114,10 +115,11 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                                 horizontal: 9,
                               ),
                               decoration: BoxDecoration(
-                                color: lightBlueColor,
+                                color: context.getDropDownColor(),
                                 borderRadius: BorderRadius.circular(9),
                               ),
                               child: DropdownButton<Units>(
+                                style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
                                 borderRadius: BorderRadius.circular(9),
                                 value: unitsToConvertTo,
                                 underline: Container(),
@@ -140,16 +142,20 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                           children: [
                             Text(
                               "MMC Voltage: ${seriesCapNum * voltage}",
-                              style: biggerTextStyleOpenSans15,
+                              style: theme.textTheme.headlineSmall,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                  color: lightBlueColor,
-                                  borderRadius: BorderRadius.circular(9)),
-                              child: Text("V"),
+                                color: context.getDropDownColor(),
+                                borderRadius: BorderRadius.circular(9),
+                              ),
+                              child: Text(
+                                "V",
+                                style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
+                              ),
                             )
                           ],
                         ),
@@ -174,9 +180,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                       }
                     },
                     validator: (text) {
-                      if (text == null ||
-                          text.isEmpty ||
-                          double.tryParse(text) == 0) {
+                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
                         return "Capacitance not valid";
                       } else {
                         return null;
@@ -191,27 +195,31 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     },
                     dropDownList: capacitanceDropDownList,
                   ),
-                  InputField(
-                    controller: voltageController,
-                    unitText: voltageUnitText,
-                    inputType:
-                        const TextInputType.numberWithOptions(signed: true),
-                    inputFormatter: [FilteringTextInputFormatter.digitsOnly],
-                    maxLength: 6,
-                    hintText: "Enter single capacitor voltage",
-                    labelText: "Voltage",
-                    onTextChanged: (text) {
-                      setState(() {
-                        voltage = int.parse(text);
-                      });
-                    },
-                    validator: (text) {
-                      if (text == null || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                    ),
+                    child: InputField(
+                      controller: voltageController,
+                      unitText: voltageUnitText,
+                      inputType: const TextInputType.numberWithOptions(signed: true),
+                      inputFormatter: [FilteringTextInputFormatter.digitsOnly],
+                      maxLength: 6,
+                      hintText: "Enter single capacitor voltage",
+                      labelText: "Voltage",
+                      onTextChanged: (text) {
+                        setState(() {
+                          voltage = int.parse(text);
+                        });
+                      },
+                      validator: (text) {
+                        if (text == null || double.tryParse(text) == 0) {
+                          return "Invalid input";
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                   InputField(
                     controller: seriesCapNumController,
