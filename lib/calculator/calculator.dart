@@ -12,12 +12,33 @@ class Calculator {
     converter = Converter();
   }
 
-  double calculateMMC(double capacitance, int seriesCap, int parallelCap) {
+  /**
+   * Function used to calculate capacitor bank capacitance.
+   *
+   * Capacitor bank can be represented as a string of capacitors connected in series and parallel to achieve
+   * desired capacitance and voltage rating.
+   *
+   *
+   * String of capacitors could look something like this:
+   * ```dart
+   * |--| |---| |---| |--|
+   * |                   |
+   * |--| |---| |---| |--|
+   * ```
+   *
+   * Illustration above represents MMC bank which consists of three capacitors in series
+   * and two capacitors in parallel
+   *
+   * - [capacitance] represents single capacitor capacitance
+   * - [seriesCapNum] is the number of capacitors in series
+   * - [parallelCapNum] is the number of capacitors in parallel
+   */
+  double calculateMMC(double capacitance, int seriesCapNum, int parallelCapNum) {
     double? _capacitance = 0.0;
 
     try {
-      var _cap = (capacitance * parallelCap) / seriesCap;
-      _capacitance = double.parse(_cap.toStringAsFixed(7));
+      var _cap = (capacitance * parallelCapNum) / seriesCapNum;
+      _capacitance = _cap;
     } catch (e) {
       _capacitance = 0.0;
     }
@@ -121,15 +142,4 @@ class Calculator {
     // Convert to default because formula used above returns inductance in microhenries
     return converter.convertToDefault(inductance, Units.MICRO);
   }
-
-/*var coilWidth = turns * (wireDiameterInches + turnSpacingInches);
-
-    var innerRadius = innerDiameterInches / 2;
-    var avgRadius = innerRadius + coilWidth / 2;
-
-    var inductance = (math.pow(turns * avgRadius, 2)) / (30 * avgRadius - 11 * innerDiameterInches);
-
-    // Convert to default because formula used above returns inductance in microhenries
-    return converter.convertToDefault(inductance, Units.MICRO);*/
-
 }

@@ -1,6 +1,6 @@
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/providers/mmc_provider.dart';
 import 'package:coiler_app/util/constants.dart';
-import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:coiler_app/util/list_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
@@ -8,6 +8,7 @@ import 'package:coiler_app/widgets/input_field.dart';
 import 'package:coiler_app/widgets/input_field_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class CapacitorScreen extends StatefulWidget {
   const CapacitorScreen({Key? key}) : super(key: key);
@@ -21,16 +22,6 @@ class CapacitorScreen extends StatefulWidget {
 class _CapacitorScreenState extends State<CapacitorScreen> {
   Calculator calculator = Calculator();
 
-  double capacitance = 0.0;
-  int seriesCapNum = 0;
-  int parallelCapNum = 0;
-  int voltage = 0;
-
-  double _finalCapacitance = 0.0;
-
-  Units _capacitance = Units.MICRO;
-  Units unitsToConvertTo = Units.MICRO;
-
   TextEditingController controller = TextEditingController();
   TextEditingController voltageController = TextEditingController();
   TextEditingController seriesCapNumController = TextEditingController();
@@ -38,42 +29,10 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
 
   final formKey = GlobalKey<FormState>();
 
-  void submitValues() {
-    if (capacitance != 0) {
-      if (parallelCapNum > 0 && seriesCapNum < 1) {
-        seriesCapNum = 1;
-      }
-      if (seriesCapNum > 1 && parallelCapNum < 1) {
-        parallelCapNum = 1;
-      } else if (parallelCapNum < 1 && seriesCapNum < 1) {
-        parallelCapNum = 1;
-        seriesCapNum = 1;
-      }
-      calculateResult();
-    }
-  }
-
-  void calculateResult() {
-    double capacitance = calculator.calculateMMC(
-      this.capacitance,
-      seriesCapNum,
-      parallelCapNum,
-    );
-    setState(() {
-      _finalCapacitance = capacitance;
-      convertUnits();
-    });
-  }
-
-  void convertUnits() {
-    setState(() {
-      _finalCapacitance = Converter().convertUnits(_finalCapacitance, _capacitance, unitsToConvertTo);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final provider = Provider.of<CapacitorBankProvider>(context);
     return Scaffold(
       backgroundColor: theme.canvasColor,
       body: SafeArea(
@@ -82,6 +41,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
             padding: const EdgeInsets.all(16),
             child: Form(
               key: formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -105,7 +65,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Final capacitance: $_finalCapacitance",
+                              "Final capacitance: ${provider.capacitanceResult.toStringAsFixed(8)}",
                               style: theme.textTheme.headlineSmall,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -121,14 +81,12 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                               child: DropdownButton<Units>(
                                 style: theme.textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold),
                                 borderRadius: BorderRadius.circular(9),
-                                value: unitsToConvertTo,
+                                value: provider.resultCapacitanceUnit,
                                 underline: Container(),
                                 items: capacitanceDropDownList,
                                 onChanged: (value) {
-                                  setState(() {
-                                    unitsToConvertTo = value!;
-                                    calculateResult();
-                                  });
+                                  provider.setCapacitanceResultUnit(value!);
+                                  provider.calculateResult();
                                 },
                               ),
                             )
@@ -141,7 +99,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "MMC Voltage: ${seriesCapNum * voltage}",
+                              "MMC Voltage: ${provider.voltageResult}",
                               style: theme.textTheme.headlineSmall,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -171,55 +129,39 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     controller: controller,
                     onTextChanged: (text) {
                       var capacitance = double.tryParse(text);
-
-                      if (capacitance != null) {
-                        setState(() {
-                          this.capacitance = capacitance;
-                          submitValues();
-                        });
-                      }
+                      provider.validateCapacitance(capacitance);
+                      provider.calculateResult();
                     },
-                    validator: (text) {
-                      if (text == null || text.isEmpty || double.tryParse(text) == 0) {
-                        return "Capacitance not valid";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownValue: _capacitance,
+                    validator: (text) => null,
+                    errorText: provider.capacitance.error,
+                    dropDownValue: provider.capacitanceUnit,
                     onDropDownChanged: (value) {
-                      setState(() {
-                        _capacitance = value!;
-                        submitValues();
-                      });
+                      provider.setCapacitanceUnit(value!);
+                      provider.calculateResult();
                     },
                     dropDownList: capacitanceDropDownList,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                    ),
-                    child: InputField(
-                      controller: voltageController,
-                      unitText: voltageUnitText,
-                      inputType: const TextInputType.numberWithOptions(signed: true),
-                      inputFormatter: [FilteringTextInputFormatter.digitsOnly],
-                      maxLength: 6,
-                      hintText: "Enter single capacitor voltage",
-                      labelText: "Voltage",
-                      onTextChanged: (text) {
-                        setState(() {
-                          voltage = int.parse(text);
-                        });
-                      },
-                      validator: (text) {
-                        if (text == null || double.tryParse(text) == 0) {
-                          return "Invalid input";
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  InputField(
+                    controller: voltageController,
+                    unitText: voltageUnitText,
+                    inputType: const TextInputType.numberWithOptions(signed: true),
+                    inputFormatter: [FilteringTextInputFormatter.digitsOnly],
+                    maxLength: 6,
+                    hintText: "Enter single capacitor voltage",
+                    labelText: "Voltage",
+                    onTextChanged: (text) {
+                      int? voltage = int.tryParse(text);
+                      provider.validateVoltage(voltage);
+                      provider.calculateResult();
+                    },
+                    validator: (text) => null,
+                    errorText: provider.voltage.error,
+                  ),
+                  const SizedBox(
+                    height: 16,
                   ),
                   InputField(
                     controller: seriesCapNumController,
@@ -227,49 +169,30 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     labelText: "Series capacitor count",
                     onTextChanged: (text) {
                       int? seriesNum = int.tryParse(text);
-                      setState(() {
-                        if (seriesNum != null) {
-                          seriesCapNum = seriesNum;
-                        } else {
-                          seriesCapNum = 1;
-                        }
-                        submitValues();
-                      });
+                      provider.validateSeriesCaps(seriesNum);
+                      provider.calculateResult();
                     },
-                    validator: (text) {
-                      if (text == null || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
-                    maxLength: 4,
+                    validator: (text) => null,
+                    errorText: provider.seriesCapsNum.error,
+                    maxLength: 2,
                     unitText: "No.",
                     inputFormatter: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                  const SizedBox(
+                    height: 16,
                   ),
                   InputField(
                     controller: parallelCapNumController,
                     hintText: "Capacitors in parallel",
                     labelText: "Parallel capacitor count",
                     onTextChanged: (text) {
-                      int? parallelNum = int.tryParse(text);
-                      setState(() {
-                        if (parallelNum != null) {
-                          parallelCapNum = parallelNum;
-                        } else {
-                          parallelCapNum = 1;
-                        }
-                        submitValues();
-                      });
+                      int? parallelCapsNum = int.tryParse(text);
+                      provider.validateParallelCaps(parallelCapsNum);
+                      provider.calculateResult();
                     },
-                    validator: (text) {
-                      if (text == null || double.tryParse(text) == 0) {
-                        return "Invalid input";
-                      } else {
-                        return null;
-                      }
-                    },
-                    maxLength: 4,
+                    validator: (text) => null,
+                    errorText: provider.parallelCapsNum.error,
+                    maxLength: 2,
                     unitText: "No.",
                     inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                   ),
