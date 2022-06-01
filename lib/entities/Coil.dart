@@ -1,4 +1,4 @@
-import 'package:coiler_app/database/drift_coil_database.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/CoilInfo.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/entities/SecondaryCoil.dart';

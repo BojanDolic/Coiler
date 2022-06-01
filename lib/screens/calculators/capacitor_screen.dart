@@ -1,8 +1,14 @@
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
+import 'package:coiler_app/entities/args/CapacitorBankArgs.dart';
 import 'package:coiler_app/providers/mmc_provider.dart';
+import 'package:coiler_app/util/SnackbarUtil.dart';
+import 'package:coiler_app/util/color_constants.dart' as ColorUtil;
 import 'package:coiler_app/util/constants.dart';
+import 'package:coiler_app/util/conversion.dart';
 import 'package:coiler_app/util/extensions/theme_extension.dart';
 import 'package:coiler_app/util/list_constants.dart';
+import 'package:coiler_app/util/ui_constants.dart';
 import 'package:coiler_app/widgets/border_container.dart';
 import 'package:coiler_app/widgets/input_field.dart';
 import 'package:coiler_app/widgets/input_field_dropdown.dart';
@@ -11,9 +17,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class CapacitorScreen extends StatefulWidget {
-  const CapacitorScreen({Key? key}) : super(key: key);
+  const CapacitorScreen({
+    Key? key,
+    this.args,
+  }) : super(key: key);
 
   static const String id = "/calculators/mmc";
+
+  final CapacitorBankArgs? args;
 
   @override
   _CapacitorScreenState createState() => _CapacitorScreenState();
@@ -21,18 +32,53 @@ class CapacitorScreen extends StatefulWidget {
 
 class _CapacitorScreenState extends State<CapacitorScreen> {
   Calculator calculator = Calculator();
+  Converter converter = Converter();
 
-  TextEditingController controller = TextEditingController();
+  TextEditingController capacitanceController = TextEditingController();
   TextEditingController voltageController = TextEditingController();
   TextEditingController seriesCapNumController = TextEditingController();
   TextEditingController parallelCapNumController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
 
+  late CapacitorBankProvider provider;
+
+  void loadCoilInfo(CapacitorBank capacitorBank) {
+    final _provider = Provider.of<CapacitorBankProvider>(context, listen: false);
+
+    _provider.loadCapBankInformation(capacitorBank);
+
+    capacitanceController.text = _provider.capacitance.value.toString();
+    voltageController.text = _provider.voltage.value.toString();
+    seriesCapNumController.text = _provider.seriesCapsNum.value.toString();
+    parallelCapNumController.text = _provider.parallelCapsNum.value.toString();
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      var args = widget.args;
+
+      if (args != null) {
+        var editing = args.editing;
+
+        provider.isEditing(editing);
+
+        if (editing) {
+          final capBank = args.capBank;
+          if (capBank != null) {
+            loadCoilInfo(capBank);
+          }
+        }
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final provider = Provider.of<CapacitorBankProvider>(context);
+    provider = Provider.of<CapacitorBankProvider>(context);
     return Scaffold(
       backgroundColor: theme.canvasColor,
       body: SafeArea(
@@ -126,7 +172,7 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                   InputFieldDropDown(
                     hintText: "Single capacitor capacitance",
                     labelText: "Capacitance",
-                    controller: controller,
+                    controller: capacitanceController,
                     onTextChanged: (text) {
                       var capacitance = double.tryParse(text);
                       provider.validateCapacitance(capacitance);
@@ -196,6 +242,26 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
                     unitText: "No.",
                     inputFormatter: [FilteringTextInputFormatter.digitsOnly],
                   ),
+                  Visibility(
+                    visible: provider.editing,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ),
+                      child: MaterialButton(
+                        elevation: 3,
+                        focusElevation: 0,
+                        highlightElevation: 0,
+                        splashColor: Colors.lightBlueAccent,
+                        color: ColorUtil.lightestBlue,
+                        shape: roundedBorder16,
+                        onPressed: () {
+                          saveCoil();
+                        },
+                        child: const Text("SAVE COIL INFO"),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -203,5 +269,15 @@ class _CapacitorScreenState extends State<CapacitorScreen> {
         ),
       ),
     );
+  }
+
+  void saveCoil() {
+    if (!provider.validate()) {
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Check your input fields!");
+      return;
+    }
+
+    final coil = provider.getCapacitorBank();
+    Navigator.pop(context, coil);
   }
 }

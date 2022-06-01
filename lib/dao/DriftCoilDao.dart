@@ -1,4 +1,5 @@
 import 'package:coiler_app/database/drift_coil_database.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart' as entities;
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/CoilInfo.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
@@ -73,6 +74,50 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
     );
   }
 
+  Future insertCapacitorBank(Coil coil) {
+    final capacitor = coil.mmc;
+    if (capacitor == null) {
+      return Future.error("Error inserting capacitor bank!");
+    }
+    return (into(capacitorBank).insert(
+      CoilCapacitor(
+        coilId: coil.id,
+        capacitance: capacitor.capacitance,
+        seriesCapacitorCount: capacitor.seriesCapacitorCount,
+        parallelCapacitorCount: capacitor.parallelCapacitorCount,
+        capacitorName: capacitor.capacitorName,
+        bankVoltage: capacitor.bankVoltage,
+        singleCapacitorCapacitance: capacitor.singleCapacitorCapacitance,
+        singleCapVoltage: capacitor.singleCapacitorVoltage,
+      ),
+    ));
+  }
+
+  Future updateCapacitorBank(Coil coil) {
+    final _capacitorBank = coil.mmc;
+    if (_capacitorBank == null) {
+      return Future.error("Capacitor bank value is null");
+    }
+    return (update(capacitorBank)..where((tbl) => tbl.coilId.equals(coil.id))).write(
+      CoilCapacitor(
+        capacitance: _capacitorBank.capacitance,
+        singleCapacitorCapacitance: _capacitorBank.singleCapacitorCapacitance,
+        bankVoltage: _capacitorBank.bankVoltage,
+        singleCapVoltage: _capacitorBank.singleCapacitorVoltage,
+        seriesCapacitorCount: _capacitorBank.seriesCapacitorCount,
+        parallelCapacitorCount: _capacitorBank.parallelCapacitorCount,
+        capacitorName: _capacitorBank.capacitorName,
+      ),
+    );
+  }
+
+  Future deleteCapacitorBank(Coil coil) {
+    if (coil.mmc == null) {
+      return Future.error("Unable to delete capacitor bank: bank is null");
+    }
+    return (delete(capacitorBank)..where((tbl) => tbl.coilId.equals(coil.id))).go();
+  }
+
   Future insertTopload(Coil coil) {
     final topload = coil.topload;
 
@@ -110,7 +155,8 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
     return select(teslacoils)
         .join([
           leftOuterJoin(primary_alias, primary_alias.primary_id.equalsExp(teslacoils.id)),
-          leftOuterJoin(secondary_alias, secondary_alias.secondary_id.equalsExp(teslacoils.id))
+          leftOuterJoin(secondary_alias, secondary_alias.secondary_id.equalsExp(teslacoils.id)),
+          leftOuterJoin(capacitorBank, capacitorBank.coilId.equalsExp(teslacoils.id))
         ])
         .watch()
         .map(
@@ -128,13 +174,16 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
                 coilName: coilInfo.name,
                 coilDesc: coilInfo.description,
                 coilType: coilInfo.type,
+                primaryResonantFrequency: coilInfo.primaryFrequency,
+                secondaryResonantFrequency: coilInfo.secondaryFrequency,
               );
 
               fullCoil.coilInfo = coilInfoObj;
 
               var primary = e.readTableOrNull(primary_alias);
-              print("Primary coil value from DB: $primary");
+              var capBankTable = e.readTableOrNull(capacitorBank);
 
+              // Primary coil information
               if (primary != null) {
                 PrimaryCoil _primaryCoil = PrimaryCoil(
                   id: primary.id,
@@ -148,6 +197,21 @@ class DriftCoilDao extends DatabaseAccessor<DriftCoilDatabase> with _$DriftCoilD
                 );
 
                 fullCoil.primaryCoil = _primaryCoil;
+              }
+
+              // MMC information
+              if (capBankTable != null) {
+                entities.CapacitorBank capacitorBank = entities.CapacitorBank(
+                  id: capBankTable.id,
+                  capacitance: capBankTable.capacitance,
+                  bankVoltage: capBankTable.bankVoltage,
+                  singleCapacitorVoltage: capBankTable.singleCapVoltage,
+                  singleCapacitorCapacitance: capBankTable.singleCapacitorCapacitance,
+                  seriesCapacitorCount: capBankTable.seriesCapacitorCount,
+                  parallelCapacitorCount: capBankTable.parallelCapacitorCount,
+                );
+
+                fullCoil.mmc = capacitorBank;
               }
 
               return fullCoil;

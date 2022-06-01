@@ -1,4 +1,5 @@
 import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/Validation.dart';
 import 'package:coiler_app/util/constants.dart';
 import 'package:coiler_app/util/conversion.dart';
@@ -27,6 +28,9 @@ class CapacitorBankProvider extends ChangeNotifier {
   Units get capacitanceUnit => _capacitanceUnit;
   Units get resultCapacitanceUnit => _resultCapacitanceUnit;
 
+  bool _isEditing = false;
+  bool get editing => _isEditing;
+
   void calculateResult() {
     if (_validateVoltage()) {
       _calculateVoltage();
@@ -50,6 +54,29 @@ class CapacitorBankProvider extends ChangeNotifier {
   void _calculateVoltage() {
     final voltage = _seriesCaps.value * _voltage.value;
     voltageResult = voltage;
+  }
+
+  CapacitorBank getCapacitorBank() {
+    final capacitance = converter.convertToDefault(capacitanceResult, _resultCapacitanceUnit);
+    final singleCapCapacitance = converter.convertToDefault(_capacitance.value, _capacitanceUnit);
+
+    return CapacitorBank(
+      capacitance: capacitance,
+      singleCapacitorCapacitance: singleCapCapacitance,
+      seriesCapacitorCount: _seriesCaps.value,
+      parallelCapacitorCount: _parallelCaps.value,
+      bankVoltage: voltageResult,
+      singleCapacitorVoltage: _voltage.value,
+    );
+  }
+
+  void loadCapBankInformation(CapacitorBank capacitorBank) {
+    setCapacitance(capacitorBank.capacitance);
+    setSingleCapCapacitance(capacitorBank.singleCapacitorCapacitance);
+    setParallelCapNum(capacitorBank.parallelCapacitorCount);
+    setSeriesCapNum(capacitorBank.seriesCapacitorCount);
+    setBankVoltage(capacitorBank.bankVoltage);
+    setSingleCapVoltage(capacitorBank.singleCapacitorVoltage);
   }
 
   void validateCapacitance(double? capacitance) {
@@ -98,11 +125,52 @@ class CapacitorBankProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCapacitance(double capacitance) {
+    final finalCapacitance = converter.convertUnits(capacitance, Units.DEFAULT, _resultCapacitanceUnit);
+    capacitanceResult = finalCapacitance;
+    notifyListeners();
+  }
+
+  void setSingleCapCapacitance(double capacitance) {
+    final finalCapacitance = converter.convertUnits(capacitance, Units.DEFAULT, _capacitanceUnit);
+    _capacitance.value = finalCapacitance;
+    notifyListeners();
+  }
+
+  void setBankVoltage(int voltage) {
+    voltageResult = voltage;
+    notifyListeners();
+  }
+
+  void setSingleCapVoltage(int voltage) {
+    _voltage.value = voltage;
+    notifyListeners();
+  }
+
+  void setSeriesCapNum(int num) {
+    _seriesCaps.value = num;
+    notifyListeners();
+  }
+
+  void setParallelCapNum(int num) {
+    _parallelCaps.value = num;
+    notifyListeners();
+  }
+
+  void isEditing(bool isEditing) {
+    _isEditing = isEditing;
+    notifyListeners();
+  }
+
   bool _validateCapacitance() {
     return (_capacitance.value != null && _seriesCaps.value != null && _parallelCaps.value != null && _voltage.value != null);
   }
 
   bool _validateVoltage() {
     return (_voltage.value != null && _seriesCaps.value != null);
+  }
+
+  bool validate() {
+    return (_validateCapacitance() && _validateVoltage());
   }
 }

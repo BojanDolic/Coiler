@@ -1,3 +1,6 @@
+import 'package:coiler_app/calculator/calculator.dart';
+import 'package:coiler_app/dao/DriftCoilDao.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
 import 'package:coiler_app/util/constants.dart';
@@ -8,6 +11,12 @@ import 'package:flutter/cupertino.dart';
 /// Provider for single selected coil
 class CoilProvider extends ChangeNotifier {
   late Coil _coil;
+  final calculator = Calculator();
+  final converter = Converter();
+
+  final DriftCoilDao _driftCoilDao;
+
+  CoilProvider(this._driftCoilDao);
 
   set coil(Coil value) {
     _coil = value;
@@ -28,11 +37,60 @@ class CoilProvider extends ChangeNotifier {
   void setPrimaryCoil(PrimaryCoil primaryCoil) {
     primaryCoil.id = _coil.primaryCoil?.id; // Setting id
     _coil.primaryCoil = primaryCoil;
+    _checkPrimaryComponents();
+    notifyListeners();
+  }
+
+  void _checkPrimaryComponents() {
+    //Check if components are present
+    if (!hasPrimaryComponents()) {
+      _removePrimaryFrequency();
+      //Clear errors
+      return;
+    }
+    //Calculate resonant frequency
+    _calculatePrimaryResonantFrequency();
+    notifyListeners();
+    // Check for primary errors
+  }
+
+  void _removePrimaryFrequency() {
+    _coil.coilInfo.primaryResonantFrequency = 0;
+    _driftCoilDao.updateCoilInfo(_coil);
+    notifyListeners();
+  }
+
+  void _calculatePrimaryResonantFrequency() {
+    final primaryCoil = _coil.primaryCoil!;
+    final capBank = _coil.mmc!;
+    final frequency = calculator.calculateResFrequency(primaryCoil.inductance, capBank.capacitance);
+
+    _coil.coilInfo.primaryResonantFrequency = frequency;
+    setPrimaryResFrequency(frequency);
+
+    _driftCoilDao.updateCoilInfo(_coil);
+
+    notifyListeners();
+  }
+
+  void setCapacitorBank(CapacitorBank? bank) {
+    if (bank != null) {
+      bank.id = _coil.mmc?.id;
+    }
+    _coil.mmc = bank;
+    _checkPrimaryComponents();
+    notifyListeners();
+  }
+
+  void removeCapacitorBank() {
+    _coil.mmc = null;
+    _checkPrimaryComponents();
     notifyListeners();
   }
 
   void removePrimaryCoil() {
     _coil.primaryCoil = null;
+    _checkPrimaryComponents();
     notifyListeners();
   }
 
@@ -54,8 +112,9 @@ class CoilProvider extends ChangeNotifier {
     if (frequency == 0) {
       return null;
     }
+    final finalFreq = converter.convertUnits(frequency, Units.DEFAULT, Units.KILO);
 
-    return frequency.toStringAsFixed(4);
+    return finalFreq.toStringAsFixed(3) + "kHz";
   }
 
   String? displaySecondaryResonantFrequency() {
@@ -68,8 +127,12 @@ class CoilProvider extends ChangeNotifier {
   }
 
   String? displayPrimaryCapacitance() {
-    final capacitance = Converter().convertUnits(_coil.mmc?.capacitance, Units.DEFAULT, Units.NANO);
-    return (capacitance > 0) ? capacitance.toStringAsFixed(3) + " nF" : null;
+    final _capacitance = _coil.mmc?.capacitance;
+
+    if (_capacitance == null) {
+      return null;
+    }
+    return (_capacitance > 0) ? _capacitance.toStringWithPrefix(2).toFarad() : null;
   }
 
   String? getToploadCapacitance() {

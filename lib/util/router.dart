@@ -1,4 +1,5 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
+import 'package:coiler_app/entities/args/CapacitorBankArgs.dart';
 import 'package:coiler_app/entities/args/FlatCoilArgs.dart';
 import 'package:coiler_app/providers/FlatCoilProvider.dart';
 import 'package:coiler_app/providers/FrequencyProvider.dart';
@@ -52,12 +53,18 @@ class Router {
       case CalculatorsScreen.id:
         return MaterialPageRoute(builder: (_) => const CalculatorsScreen());
       case CapacitorScreen.id:
-        return MaterialPageRoute(
-          builder: (context) => ChangeNotifierProvider<CapacitorBankProvider>(
-            create: (context) => CapacitorBankProvider(),
-            child: const CapacitorScreen(),
-          ),
-        );
+        {
+          final args = settings.arguments as CapacitorBankArgs?;
+
+          return MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider<CapacitorBankProvider>(
+              create: (context) => CapacitorBankProvider(),
+              child: CapacitorScreen(
+                args: args,
+              ),
+            ),
+          );
+        }
       case ResonantFrequencyScreen.id:
         {
           return MaterialPageRoute(builder: (context) {

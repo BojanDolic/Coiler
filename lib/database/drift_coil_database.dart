@@ -34,10 +34,15 @@ class Coils extends Table {
 
 @DataClassName("CoilCapacitor")
 class CapacitorBank extends Table {
+  @override
+  String get tableName => 'capacitorBank';
+
   IntColumn get id => integer().nullable().autoIncrement()();
   IntColumn get coilId => integer().nullable().customConstraint("NULL UNIQUE REFERENCES teslacoils(id) ON DELETE CASCADE")();
   RealColumn get capacitance => real()();
-  IntColumn get voltage => integer()();
+  RealColumn get singleCapacitorCapacitance => real()();
+  IntColumn get bankVoltage => integer()();
+  IntColumn get singleCapVoltage => integer()();
   IntColumn get seriesCapacitorCount => integer()();
   IntColumn get parallelCapacitorCount => integer()();
   TextColumn get capacitorName => text().withDefault(const Constant(""))();
@@ -61,11 +66,13 @@ class DriftCoilDatabase extends _$DriftCoilDatabase {
   //DriftCoilDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON;');
+      }, onUpgrade: (migrator, previousVersion, currentVersion) {
+        return migrator.deleteTable(capacitorBank.actualTableName);
       });
 }
 
