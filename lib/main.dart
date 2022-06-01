@@ -37,9 +37,15 @@ Future<void> main() async {
       Provider<DriftCoilDao>(
         create: (context) => driftDb.driftCoilDao,
       ),
-      ChangeNotifierProvider<CoilProvider>(
-        create: (context) => CoilProvider(),
+      ChangeNotifierProxyProvider<DriftCoilDao, CoilProvider>(
+        create: (context) => CoilProvider(
+          Provider.of<DriftCoilDao>(context, listen: false),
+        ),
+        update: (context, dao, coilProvider) => coilProvider!,
       ),
+      /*ChangeNotifierProvider<CoilProvider>(
+        create: (context) => CoilProvider(Provider.of<DriftCoilDao>(context)),
+      ),*/
     ],
     child: MyApp(
       driftDao: driftDb.driftCoilDao,

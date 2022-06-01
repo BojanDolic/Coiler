@@ -1,12 +1,15 @@
 import 'package:coiler_app/arguments/HelicalCalculatorArgs.dart';
 import 'package:coiler_app/dao/DriftCoilDao.dart';
+import 'package:coiler_app/entities/CapacitorBank.dart';
 import 'package:coiler_app/entities/Coil.dart';
 import 'package:coiler_app/entities/ComponentData.dart';
 import 'package:coiler_app/entities/FlatCoil.dart';
 import 'package:coiler_app/entities/HelicalCoil.dart';
 import 'package:coiler_app/entities/PrimaryCoil.dart';
+import 'package:coiler_app/entities/args/CapacitorBankArgs.dart';
 import 'package:coiler_app/entities/args/FlatCoilArgs.dart';
 import 'package:coiler_app/providers/CoilProvider.dart';
+import 'package:coiler_app/screens/calculators/capacitor_screen.dart';
 import 'package:coiler_app/screens/calculators/flat_coil_screen.dart';
 import 'package:coiler_app/screens/calculators/helical_coil_screen.dart';
 import 'package:coiler_app/util/DialogCallback.dart';
@@ -70,7 +73,7 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
     final coilProvider = Provider.of<CoilProvider>(context, listen: true);
     final theme = Theme.of(context);
 
-    coilDescController.text = coilProvider.coil.coilInfo.coilDesc; //= coil.coilDesc;
+    coilDescController.text = coilProvider.coil.coilInfo.coilDesc;
     return WillPopScope(
       onWillPop: () async {
         return await onWillPopScreen(context, isEditingInfo);
@@ -263,16 +266,33 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
                                                     SnackbarUtil.showErrorSnackBar(context: context, errorText: "Capacitor bank is not added");
                                                     break;
                                                   }
+                                                  navigateToCapacitorBank(coilProvider, true);
                                                   break;
                                                 }
                                               case DialogAction.onAdd:
-                                                // TODO: Handle this case.
+                                                if (coilProvider.hasCapacitorBank()) {
+                                                  SnackbarUtil.showInfoSnackBar(context: context, text: "Capacitor bank already added!");
+                                                  return;
+                                                }
+                                                navigateToCapacitorBank(coilProvider, false);
                                                 break;
                                               case DialogAction.onInformation:
-                                                // TODO: Handle this case.
+                                                if (!coilProvider.hasCapacitorBank()) {
+                                                  break;
+                                                }
+                                                openInformationDialog(
+                                                  context,
+                                                  coilProvider.coil,
+                                                  ComponentType.capacitor,
+                                                  true,
+                                                );
                                                 break;
                                               case DialogAction.onDelete:
-                                                // TODO: Handle this case.
+                                                if (!coilProvider.hasCapacitorBank()) {
+                                                  SnackbarUtil.showErrorSnackBar(context: context, errorText: "No capacitor bank to delete");
+                                                  return;
+                                                }
+                                                deleteCapacitorBank(coilProvider);
                                                 break;
                                             }
                                           },
@@ -569,18 +589,10 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
               ),
               DialogCategoryWidget(
                 text: 'Toroid topload',
-                imageAsset: 'assets/toroid_icon.png',
+                imageAsset: 'assets/full_toroid_icon.png',
                 color: Colors.blueAccent,
                 onTap: () {
                   Navigator.pop(context);
-/*
-                  if (coilFromChange) {
-                    if (Provider.of<CoilProvider>(context, listen: false).coil.primaryCoil?.coilType == ComponentType.helicalCoil.index) {
-                      //TODO return message that current coil type is the same as selected type
-                    } else {}
-                  }
-
-                  navigateToPrimaryCoilScreen();*/
                 },
               ),
               const SizedBox(
@@ -667,22 +679,80 @@ class _CoilInfoScreenState extends State<CoilInfoScreen> {
   }
 
   void updatePrimaryCoil(PrimaryCoil primaryCoil, CoilProvider provider) {
-    provider.setPrimaryCoil(primaryCoil);
     Provider.of<DriftCoilDao>(context, listen: false).updatePrimaryCoil(provider.coil).then((value) {
+      provider.setPrimaryCoil(primaryCoil);
       SnackbarUtil.showInfoSnackBar(context: context, text: "Coil updated successfully");
     }).catchError((err) {
-      SnackbarUtil.showErrorSnackBar(context: context, errorText: err.toString());
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error updating primary coil: ${err.toString()}");
     });
   }
 
   void insertPrimaryCoil(PrimaryCoil coil, CoilProvider provider) {
-    try {
-      provider.setPrimaryCoil(coil);
-      Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(provider.coil);
-    } catch (e) {
-      print(e);
+    provider.setPrimaryCoil(coil);
+
+    Provider.of<DriftCoilDao>(context, listen: false).insertPrimary(provider.coil).then((value) {
+      SnackbarUtil.showInfoSnackBar(context: context, text: "Primary coil inserted!");
+    }).catchError((error) {
+      provider.removePrimaryCoil();
       SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error inserting primary coil!");
+    });
+  }
+
+  void navigateToCapacitorBank(CoilProvider coilProvider, bool editing) async {
+    // User wants to edit capacitor bank
+    if (editing) {
+      final capacitorInfo = coilProvider.coil.mmc;
+
+      final args = CapacitorBankArgs(capBank: capacitorInfo, editing: true);
+
+      final CapacitorBank? capacitorBank = await (Navigator.pushNamed(context, CapacitorScreen.id, arguments: args)) as CapacitorBank;
+
+      if (capacitorBank == null) {
+        return;
+      }
+      updateCapacitorBank(capacitorBank, coilProvider);
+    } else {
+      final args = CapacitorBankArgs(editing: true);
+
+      final CapacitorBank? capacitorBank = await (Navigator.pushNamed(context, CapacitorScreen.id, arguments: args)) as CapacitorBank;
+
+      if (capacitorBank == null) {
+        return;
+      }
+
+      insertCapacitorBank(capacitorBank, coilProvider);
     }
+  }
+
+  void insertCapacitorBank(CapacitorBank capacitorBank, CoilProvider coilProvider) {
+    coilProvider.setCapacitorBank(capacitorBank);
+
+    Provider.of<DriftCoilDao>(context, listen: false).insertCapacitorBank(coilProvider.coil).then((value) {
+      SnackbarUtil.showInfoSnackBar(context: context, text: "Capacitor bank inserted!");
+    }).catchError((error) {
+      coilProvider.removeCapacitorBank();
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: "Error inserting capacitor bank!");
+    });
+  }
+
+  void updateCapacitorBank(CapacitorBank capacitorBank, CoilProvider coilProvider) {
+    coilProvider.setCapacitorBank(capacitorBank);
+
+    Provider.of<DriftCoilDao>(context, listen: false).updateCapacitorBank(coilProvider.coil).then((value) {
+      SnackbarUtil.showInfoSnackBar(context: context, text: "Capacitor bank updated!");
+    }).catchError((error) {
+      //coilProvider.setCapacitorBank(null);
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: error);
+    });
+  }
+
+  void deleteCapacitorBank(CoilProvider provider) {
+    Provider.of<DriftCoilDao>(context, listen: false).deleteCapacitorBank(provider.coil).then((value) {
+      provider.removeCapacitorBank();
+      SnackbarUtil.showInfoSnackBar(context: context, text: "Capacitor bank deleted!");
+    }).catchError((error) {
+      SnackbarUtil.showErrorSnackBar(context: context, errorText: error);
+    });
   }
 }
 
@@ -1002,11 +1072,11 @@ void openInformationDialog(
       switch (type) {
         case ComponentType.capacitor:
           dialog = ComponentInfoDialog(
-            componentName: "Capacitor",
+            componentName: "Capacitor bank",
             sideText: isPrimary ? "Primary" : "Secondary",
-            assetImagePath: '',
-            assetColor: Colors.blue,
-            components: [],
+            assetImagePath: 'assets/caps_icon.png',
+            assetColor: Colors.pinkAccent,
+            components: getComponentItems(coil, type, isPrimary),
           );
           break;
         case ComponentType.helicalCoil:
@@ -1053,7 +1123,46 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
 
   switch (type) {
     case ComponentType.capacitor:
-      // TODO: Handle this case.
+      final capacitorBank = coil.mmc!;
+
+      final bankCapacitance = capacitorBank.capacitance.toStringWithPrefix(3);
+      final bankVoltage = capacitorBank.bankVoltage;
+      final singleCapCapacitance = capacitorBank.singleCapacitorCapacitance.toStringWithPrefix(3);
+      final singleCapVoltage = capacitorBank.singleCapacitorVoltage;
+
+      components = [
+        ComponentData(
+          name: "Bank capacitance",
+          value: bankCapacitance.toFarad(),
+          imageAssetPath: "assets/caps_icon.png",
+        ),
+        ComponentData(
+          name: "Bank voltage",
+          value: bankVoltage.toString(),
+          imageAssetPath: "assets/lightning_icon.png",
+        ),
+        ComponentData(
+          name: "Single capacitor capacitance",
+          value: singleCapCapacitance.toFarad(),
+          imageAssetPath: "assets/caps_icon.png",
+        ),
+        ComponentData(
+          name: "Single capacitor voltage",
+          value: singleCapVoltage.toString(),
+          imageAssetPath: "assets/lightning_icon.png",
+        ),
+        ComponentData(
+          name: "Number of capacitors in series",
+          value: capacitorBank.seriesCapacitorCount.toString(),
+          imageAssetPath: "assets/icons/quantity_icon.png",
+        ),
+        ComponentData(
+          name: "Number of capacitors in parallel",
+          value: capacitorBank.parallelCapacitorCount.toString(),
+          imageAssetPath: "assets/icons/quantity_icon.png",
+        ),
+      ];
+
       break;
     case ComponentType.helicalCoil:
       {
@@ -1067,7 +1176,7 @@ List<ComponentData> getComponentItems(Coil coil, ComponentType type, bool isPrim
           components = [
             ComponentData(
               name: "Inductance",
-              value: inductance.toHenry(), //Converter().convertToMicro(helicalCoil.inductance).toStringAsFixed(2) + " µH",
+              value: inductance.toHenry(),
               imageAssetPath: "assets/icons/inductance_icon.png",
             ),
             ComponentData(
